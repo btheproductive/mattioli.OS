@@ -64,8 +64,8 @@ export function ReadingCalendar({ getStatus, toggleStatus }: ReadingCalendarProp
 
   const isFuture = (day: number) => {
     const date = new Date(year, month, day);
-    date.setHours(23, 59, 59, 999);
-    return date > today;
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    return date > todayStart;
   };
 
   const renderDays = () => {
