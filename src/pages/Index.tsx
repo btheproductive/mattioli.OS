@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useGoals } from '@/hooks/useGoals';
+import { toast } from 'sonner';
 import { HabitCalendar } from '@/components/HabitCalendar';
 import { WeeklyView } from '@/components/WeeklyView';
 import { DailyView } from '@/components/DailyView';
@@ -115,21 +117,38 @@ const Index = () => {
                 <Download className="h-4 w-4" />
               </Button>
 
-              {/* DEBUG: Testing button visibility without AlertDialog */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 sm:h-9 sm:w-9 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border-red-500/20"
-                onClick={() => console.log('Click')}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-
-              {/* 
               <AlertDialog>
-                ...
-              </AlertDialog> 
-              */}
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 sm:h-9 sm:w-9 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border-red-500/20"
+                    title="Hard Reset (Elimina tutto)"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-destructive">Hard Reset: Attenzione!</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Questa azione eliminerà <strong>definitivamente</strong> tutte le tue abitudini e tutto lo storico dei progressi.
+                      <br /><br />
+                      I dati non potranno essere recuperati. Sei sicuro di voler procedere?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Annulla</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => resetAllData()}
+                      className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                      disabled={isResetting}
+                    >
+                      {isResetting ? 'Eliminazione...' : 'Conferma Reset Totale'}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
 
