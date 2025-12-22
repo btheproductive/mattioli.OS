@@ -104,7 +104,7 @@ export function WeeklyView({ habits, records, onToggleHabit }: WeeklyViewProps) 
                 onClose={() => setSelectedDate(null)}
                 date={selectedDate}
                 habits={habits}
-                dayRecord={selectedDayRecord}
+                records={records}
                 onToggleHabit={(habitId) => selectedDate && onToggleHabit(selectedDate, habitId)}
             />
         </div >

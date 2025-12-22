@@ -4,7 +4,7 @@ import { Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Goal } from '@/types/goals';
+import { Goal, GoalLogsMap } from '@/types/goals';
 import { cn } from '@/lib/utils';
 
 interface DayDetailsModalProps {
@@ -12,7 +12,7 @@ interface DayDetailsModalProps {
     onClose: () => void;
     date: Date | null;
     habits: Goal[];
-    dayRecord: { [key: string]: string | null };
+    records: GoalLogsMap;
     onToggleHabit: (habitId: string) => void;
 }
 
@@ -21,7 +21,7 @@ export function DayDetailsModal({
     isOpen,
     onClose,
     habits,
-    dayRecord,
+    records,
     onToggleHabit,
 }: DayDetailsModalProps) {
     if (!date) return null;
@@ -49,6 +49,7 @@ export function DayDetailsModal({
                     <ScrollArea className="max-h-[60vh]">
                         <div className="space-y-3 pr-4">
                             {validHabits.map((habit) => {
+                                const dayRecord = records[dateKey] || {};
                                 const status = dayRecord[habit.id];
                                 const isDone = status === 'done';
                                 const isMissed = status === 'missed';
