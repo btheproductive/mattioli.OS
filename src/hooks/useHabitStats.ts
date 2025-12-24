@@ -87,25 +87,28 @@ export function useHabitStats(goals: Goal[], logs: GoalLogsMap) {
 
                 if (status === 'done') {
                     if (isStreakActive) currentStreak++;
-                    // Logic fix: if we broke streak earlier (e.g. missed today), currentStreak stops increasing?
-                    // No. Current streak is "unbroken chain from NOW".
-                    // If today is missed, currentStreak is 0.
-                    // If today is null, and yesterday is done, streak is 1.
-                } else if (status === 'skipped') {
-                    // Skipped days maintain streak but don't increment? Or just ignored?
-                    // Verify: "Skipped" usually freezes streak.
-                } else {
-                    // Missed or Null (if strict) -> Break
+                } else if (status === 'missed') {
+                    // Missed: Break streak
                     if (daysBack === 1 && todayStatus !== 'missed' && todayStatus !== 'done') {
-                        // This is the "pending" case for yesterday.
-                        // If yesterday was missed/null, then current streak is definitely 0 (unless today was done).
                         isStreakActive = false;
                     } else {
                         isStreakActive = false;
                     }
+                } else {
+                    // Skipped or Null (Empty) -> Treat as Rest Day.
+                    // Do NOT break streak. Do NOT increment streak.
+                    // Just continue searching backwards.
+
+                    // Note: If we are at day 1 (yesterday) and it's empty, 
+                    // and today is empty, isStreakActive remains true (pending),
+                    // so we keep looking back for the last 'done'.
                 }
 
                 if (!isStreakActive) break;
+
+                // Safety break to prevent infinite loops if start_date is weird or huge data
+                if (daysBack > 365 * 5) break;
+
                 daysBack++;
             }
 
@@ -120,12 +123,18 @@ export function useHabitStats(goals: Goal[], logs: GoalLogsMap) {
                     if (status === 'done') {
                         totalDone++;
                         tempStreak++;
-                    } else if (status === 'skipped') {
-                        // frozen, do nothing
-                    } else {
-                        // missed or null
+                    } else if (status === 'missed') {
+                        // Only reset on missed
                         longestStreak = Math.max(longestStreak, tempStreak);
                         tempStreak = 0;
+                    } else {
+                        // Empty or Skipped -> Continue without resetting, but don't increment
+                        // This effectively "bridges" the gap.
+                        // Example: Done (1), Empty, Done (1) -> Streak should be 2.
+                        // Wait, if I want Done, Empty, Done to be Streak 2...
+                        // Then tempStreak should NOT reset. Correct.
+                        // And it doesn't increment. Correct.
+                        // So next time 'done' hits, tempStreak goes 1 -> 2. Correct.
                     }
                 }
                 longestStreak = Math.max(longestStreak, tempStreak);

@@ -87,7 +87,7 @@ function getWeekNumber(date: Date): number {
   return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
 }
 
-function calculateStreak(sortedDates: string[]): number {
+function calculateStreak(sortedDates: string[], records: ReadingRecord): number {
   if (sortedDates.length === 0) return 0;
 
   let maxStreak = 1;
@@ -99,11 +99,31 @@ function calculateStreak(sortedDates: string[]): number {
     const diffDays = Math.floor((curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24));
 
     if (diffDays === 1) {
+      // Consecutive days
       currentStreak++;
-      maxStreak = Math.max(maxStreak, currentStreak);
     } else {
-      currentStreak = 1;
+      // Gap detected. Check if any day in between is 'missed'
+      let isBroken = false;
+      const checkDate = new Date(prev);
+      checkDate.setDate(checkDate.getDate() + 1);
+
+      while (checkDate < curr) {
+        const key = checkDate.toISOString().split('T')[0];
+        if (records[key] === 'missed') {
+          isBroken = true;
+          break;
+        }
+        checkDate.setDate(checkDate.getDate() + 1);
+      }
+
+      if (isBroken) {
+        currentStreak = 1;
+      } else {
+        // Gap was only empty days (rest days), streak continues
+        currentStreak++;
+      }
     }
+    maxStreak = Math.max(maxStreak, currentStreak);
   }
 
   return maxStreak;
@@ -138,7 +158,7 @@ export function useReadingStats(records: ReadingRecord) {
     const totalDaysMissed = missedDates.length;
     const totalDaysMarked = totalDaysRead + totalDaysMissed;
     const percentage = totalDaysMarked > 0 ? Math.round((totalDaysRead / totalDaysMarked) * 100) : 0;
-    const longestStreak = calculateStreak(readDates);
+    const longestStreak = calculateStreak(readDates, records);
 
     // Current streak - if today is 'missed', streak is 0
     let currentStreak = 0;
@@ -151,18 +171,70 @@ export function useReadingStats(records: ReadingRecord) {
     } else {
       const checkDate = new Date(today);
 
-      // If today isn't marked yet, start checking from yesterday
-      if (!records[todayKey]) {
-        checkDate.setDate(checkDate.getDate() - 1);
-      }
+      // If today is 'done', we start counting from today.
+      // If today is empty, we check yesterday to see if the streak is alive.
+      // If today is empty AND yesterday is 'missed' -> streak 0.
+      // If today is empty AND yesterday is empty -> keep going back.
+      // Basically we look for the most recent 'done' or 'missed'.
+      // If we find 'done' first -> streak is alive, calculate it.
+      // If we find 'missed' first -> streak is dead (0).
 
-      while (true) {
-        const key = checkDate.toISOString().split('T')[0];
-        if (records[key] === 'done') {
-          currentStreak++;
-          checkDate.setDate(checkDate.getDate() - 1);
+      // However, the standard "current streak" usually implies "chain ending today".
+      // If I haven't done it today (empty), is my streak active?
+      // Yes, usually, until I miss it.
+
+      // Algorithm:
+      // 1. Find the most recent 'done' date.
+      // 2. Check if there are any 'missed' days between that date and today.
+      // 3. If no missed days, the streak is valid. Calculate it ending at that recent date.
+
+      const lastDoneDateStr = readDates[readDates.length - 1]; // sorted ascending
+      if (!lastDoneDateStr) {
+        currentStreak = 0;
+      } else {
+        const lastDoneDate = new Date(lastDoneDateStr);
+
+        // Check for cracks between lastDoneDate and Today
+        let isStreakBrokenSinceLastDone = false;
+        const tempCheck = new Date(lastDoneDate);
+        tempCheck.setDate(tempCheck.getDate() + 1);
+
+        while (tempCheck <= today) {
+          const key = tempCheck.toISOString().split('T')[0];
+          if (records[key] === 'missed') {
+            isStreakBrokenSinceLastDone = true;
+            break;
+          }
+          tempCheck.setDate(tempCheck.getDate() + 1);
+        }
+
+        if (isStreakBrokenSinceLastDone) {
+          currentStreak = 0;
         } else {
-          break;
+          // Streak is alive! Now calculate its length going backwards from lastDoneDate
+          // We can use the logic from calculateStreak but localized
+          currentStreak = 0;
+          // Re-calculate specifically for the chain ending at lastDoneDate
+
+          // Optimization: We could just iterate backwards from lastDoneDate
+          // counting 'done' and skipping 'empty', stopping at 'missed'.
+
+          let counterDate = new Date(lastDoneDate);
+          const firstRecordedDate = new Date(readDates[0]); // Don't go past beginning of time
+
+          while (counterDate >= firstRecordedDate) {
+            const key = counterDate.toISOString().split('T')[0];
+            const status = records[key];
+
+            if (status === 'done') {
+              currentStreak++;
+            } else if (status === 'missed') {
+              break;
+            }
+            // if empty, continue (gap day)
+
+            counterDate.setDate(counterDate.getDate() - 1);
+          }
         }
       }
     }
@@ -325,7 +397,7 @@ export function useReadingStats(records: ReadingRecord) {
       const totalDaysMissed = yearMissedDates.length;
       const totalDaysMarked = totalDaysRead + totalDaysMissed;
       const percentage = totalDaysMarked > 0 ? Math.round((totalDaysRead / totalDaysMarked) * 100) : 0;
-      const longestStreak = calculateStreak(yearReadDates);
+      const longestStreak = calculateStreak(yearReadDates, records);
 
       // Monthly breakdown
       const monthlyBreakdown: MonthStats[] = [];
@@ -346,7 +418,7 @@ export function useReadingStats(records: ReadingRecord) {
           daysMissed,
           daysTotal,
           percentage: daysTotal > 0 ? Math.round((daysRead / daysTotal) * 100) : 0,
-          bestStreak: calculateStreak(monthReadDates),
+          bestStreak: calculateStreak(monthReadDates, records),
         });
       }
 
@@ -417,7 +489,7 @@ export function useReadingStats(records: ReadingRecord) {
       percentage: markedDaysThisMonth > 0
         ? Math.round((currentMonthReadDates.length / markedDaysThisMonth) * 100)
         : 0,
-      bestStreak: calculateStreak(currentMonthReadDates),
+      bestStreak: calculateStreak(currentMonthReadDates, records),
     };
 
     return {
