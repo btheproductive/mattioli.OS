@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌟 Ultimate Life OS & Habit Tracker
+# 🌟 Mattioli.OS
 
 ### **Master Your Discipline. Own Your Data. Gamify Your Growth.**
 
@@ -47,15 +47,12 @@ npm run dev
 
 ## 💎 Key Features
 
-Why choose **Ultimate Life OS** over Notion, Todoist, or expensive SaaS apps?
+Why choose **Mattioli.OS** over Notion, Todoist, or expensive SaaS apps?
 
-| Feature | 🌟 Ultimate Life OS | 📝 Notion/Generic | 💰 Paid SaaS |
+| Feature | 🌟 Mattioli.OS | 📝 Notion/Generic | 💰 Paid SaaS |
 | :--- | :---: | :---: | :---: |
 | **Data Ownership** | ✅ **100% Yours** (Local/Supabase) | ❌ Cloud Only | ❌ Vendor Locked |
 | **Cost** | ✅ **Free Forever** | ⚠️ Monthly Sub | ❌ $$$ / Month |
-| **Gamification** | ✅ **XP, Levels, Missions** | ❌ Manual Setup | ⚠️ Limited |
-| **Finance Tracking** | ✅ **FIRE & Crypto Native** | ❌ Templates Needed | ⚠️ Separate App |
-| **Privacy Mode** | ✅ **One-Click Blur** | ❌ No | ❌ No |
 | **Offline First** | ✅ **Localhost Capable** | ⚠️ Limited | ❌ No |
 
 ### 🔥 Core Modules
@@ -66,7 +63,7 @@ Why choose **Ultimate Life OS** over Notion, Todoist, or expensive SaaS apps?
 Don't just check boxes. See your life in data. 
 <ul>
   <li><b>Yearly Heatmap</b>: GitHub-style contribution graph for your habits.</li>
-  <li><b>Hex Maps</b>: Beautiful visualization availability.</li>
+  <li><b>Hex Maps</b>: Beautiful visualization.</li>
   <li><b>Trend Lines</b>: Spot inconsistencies before they become failures.</li>
 </ul>
 <img src="./docs/assets/analytics_view.png" alt="Analytics" width="100%">
@@ -79,16 +76,6 @@ Don't just check boxes. See your life in data.
   <li><b>XP System</b>: Every habit earns you XP.</li>
   <li><b>Level Up</b>: Unlock new "Regions" (graphical themes) as you progress.</li>
   <li><b>Missions</b>: Weekly challenges to push your limits.</li>
-</ul>
-</details>
-
-<details>
-<summary><b>💰 Financial Independence (FIRE)</b> (Click to Expand)</summary>
-<br />
-<ul>
-  <li><b>Net Worth Tracker</b>: Manual or semi-automated tracking.</li>
-  <li><b>FIRE Calculator</b>: Know your "Freedom Date".</li>
-  <li><b>Crypto Portfolio</b>: Integrated real-time tracking.</li>
 </ul>
 </details>
 
@@ -115,7 +102,7 @@ Check out the **[Technical Deep Dive](./docs/TECHNICAL_DEEP_DIVE.md)** for:
 
 This tool is **Opinionated**. It assumes:
 1.  **Friction is the enemy**. Tracking must be instant.
-2.  **Privacy is non-negotiable**. Your finances and habits are your business.
+2.  **Privacy is non-negotiable**. Your habit data is your business.
 3.  **Aesthetics matter**. If an app looks bad, you won't use it.
 
 ---
@@ -134,6 +121,6 @@ We love contributions! Please read our [CONTRIBUTING.md](./docs/CONTRIBUTING.md)
 
 <div align="center">
   <br />
-  Made with ❤️, ☕, and <b>React</b>.
+  Made with ❤️, ☕, and <b>React</b> | Mattioli Simone.
   <br />
 </div>

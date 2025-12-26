@@ -1,6 +1,6 @@
 # ⚙️ Technical Deep Dive & Architecture
 
-> This document is for developers, contributors, and the curious. It explains **how** the Ultimate Life OS works under the hood.
+> This document provides an under-the-hood look at **Mattioli.OS**. It explains the design choices, the technology stack, and how specific features were implemented.
 
 ## 🏗 System Architecture
 

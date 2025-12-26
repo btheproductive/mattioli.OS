@@ -1,4 +1,4 @@
-# 🇺🇸 User Manual - Life OS & Habit Tracker
+# 🇺🇸 User Manual - Mattioli.OS
 
 Welcome to your new personal command center. This guide will walk you through using the application to maximize your productivity and discipline.
 
@@ -30,11 +30,6 @@ To make discipline fun, we've integrated a **Mission** system.
 - Unlock new regions and badges on the interactive map.
 - **Levels**: Level up as you maintain consistency.
 
-### 4. Finance & FIRE 🔥
-It's not just about habits. Track your path to financial freedom.
-- Use the **FIRE Calculator** to estimate when you can retire early.
-- Monitor your Crypto assets and investments in the **Investments** section.
-- Use "Privacy Mode" (the shield or eye icon) to blur sensitive numbers when in public.
 
 ---
 
@@ -53,8 +48,6 @@ It's not just about habits. Track your path to financial freedom.
 **Q: Can I use the app offline?**
 A: Yes, if you installed the local version (see technical guide), everything runs on your computer.
 
-**Q: Is my financial data safe?**
-A: Absolutely. If you use the local version, data never leaves your PC. If you use Supabase, it is protected by enterprise-grade database security rules.
 
 ---
 

@@ -1,4 +1,4 @@
-# 🤝 Contributing to Ultimate Life OS
+# 🤝 Contributing to Mattioli.OS
 
 First off, thanks for taking the time to contribute! 🎉
 

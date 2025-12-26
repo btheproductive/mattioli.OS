@@ -1,4 +1,4 @@
-# 🇮🇹 Guida Tecnica & Installazione
+# 🇮🇹 Guida Tecnica - Mattioli.OS
 
 Guida completa per sviluppatori o per chi desidera ospitare l'applicazione autonomamente.
 
