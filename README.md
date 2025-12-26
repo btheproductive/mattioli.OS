@@ -11,7 +11,8 @@
 
 <br />
 
-![App Dashboard Preview](./docs/assets/dashboard_preview.png)
+
+![Daily View](./docs/assets/Daily%20Tasks%20view%20mensile.png)
 
 <p align="center">
   <i>"We don't rise to the level of our goals. We fall to the level of our systems." — James Clear</i>
@@ -57,27 +58,29 @@ Why choose **Mattioli.OS** over Notion, Todoist, or expensive SaaS apps?
 
 ### 🔥 Core Modules
 
-<details>
-<summary><b>📊 Advanced Analytics & Heatmaps</b> (Click to Expand)</summary>
+<details open>
+<summary><b>📅 Daily Habits & Tracking</b> (Click to Collapse)</summary>
 <br />
-Don't just check boxes. See your life in data. 
-<ul>
-  <li><b>Yearly Heatmap</b>: GitHub-style contribution graph for your habits.</li>
-  <li><b>Hex Maps</b>: Beautiful visualization.</li>
-  <li><b>Trend Lines</b>: Spot inconsistencies before they become failures.</li>
-</ul>
-<img src="./docs/assets/analytics_view.png" alt="Analytics" width="100%">
+Track your daily progress with granular precision. Switch between monthly and weekly views to analyze your consistency.
+
+| Monthly View | Weekly Breakdown |
+| :---: | :---: |
+| <img src="./docs/assets/Daily%20Tasks%20view%20mensile.png" alt="Monthly View"> | <img src="./docs/assets/Daily%20Tasks%20view%20settimanale.png" alt="Weekly View"> |
+
+**Detailed Statistics:**
+<img src="./docs/assets/Daily%20Tasks%20full%20stats.png" alt="Daily Stats" width="100%">
 </details>
 
 <details>
-<summary><b>🎮 Gamification Loop</b> (Click to Expand)</summary>
+<summary><b>🎯 Macro Goals & Long-term Vision</b> (Click to Expand)</summary>
 <br />
-<ul>
-  <li><b>XP System</b>: Every habit earns you XP.</li>
-  <li><b>Level Up</b>: Unlock new "Regions" (graphical themes) as you progress.</li>
-  <li><b>Missions</b>: Weekly challenges to push your limits.</li>
-</ul>
+Align your daily actions with your life's biggest ambitions.
+
+| Single Year Focus | Multi-Year Trends |
+| :---: | :---: |
+| <img src="./docs/assets/Macro%20Obiettivi%20stats%20anno%20singolo.png" alt="Yearly Goals"> | <img src="./docs/assets/Macro%20Obiettivi%20stats%20aggregate%20multi-anno.png" alt="Long Term Trends"> |
 </details>
+
 
 ---
 
