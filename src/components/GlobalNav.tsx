@@ -4,6 +4,7 @@ import { PieChart, Grid3X3, BarChart2 } from 'lucide-react';
 
 const navItems = [
   { to: '/stats', label: 'Statistiche', icon: BarChart2 },
+  { to: '/macro-goals', label: 'Macro Obiettivi', icon: PieChart },
 
 ];
 

@@ -8,6 +8,7 @@ import { Layout } from "./components/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import Stats from "./pages/Stats";
+import MacroGoals from "./pages/MacroGoals";
 
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -60,6 +61,7 @@ const App = () => {
             }>
               <Route path="/" element={<Index />} />
               <Route path="/stats" element={<Stats />} />
+              <Route path="/macro-goals" element={<MacroGoals />} />
 
             </Route>
 

@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .env
+FROM_NOTION
+scripts/generate-sql-*.ts
+supabase/migrations/*_import_notion_goals_*.sql

@@ -146,6 +146,45 @@ export type Database = {
             referencedColumns: ["id"]
           }
         ]
+      },
+      long_term_goals: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          is_completed: boolean
+          type: "annual" | "monthly" | "weekly"
+          year: number
+          month: number | null
+          week_number: number | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          is_completed?: boolean
+          type: "annual" | "monthly" | "weekly"
+          year: number
+          month?: number | null
+          week_number?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          is_completed?: boolean
+          type?: "annual" | "monthly" | "weekly"
+          year?: number
+          month?: number | null
+          week_number?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {
