@@ -70,6 +70,7 @@ export function LongTermGoals() {
     const [exportScope, setExportScope] = useState<'all' | 'year'>('all');
     const [importReport, setImportReport] = useState<ImportReport | null>(null);
     const [newGoalTitle, setNewGoalTitle] = useState('');
+    const [newGoalColor, setNewGoalColor] = useState<string | null>(null);
 
     const queryClient = useQueryClient();
 
@@ -130,7 +131,7 @@ export function LongTermGoals() {
     });
 
     const createGoalMutation = useMutation({
-        mutationFn: async (title: string) => {
+        mutationFn: async ({ title, color }: { title: string; color: string | null }) => {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error('Not authenticated');
 
@@ -142,6 +143,7 @@ export function LongTermGoals() {
                 month: view !== 'annual' ? selectedMonth : null,
                 week_number: view === 'weekly' ? selectedWeek : null,
                 is_completed: false, // Default to false
+                color: color,
             };
 
             const { data, error } = await supabase
@@ -155,6 +157,7 @@ export function LongTermGoals() {
         },
         onSuccess: () => {
             setNewGoalTitle('');
+            setNewGoalColor(null);
             queryClient.invalidateQueries({ queryKey: ['longTermGoals'] });
             toast.success('Obiettivo creato!');
         },
@@ -207,7 +210,7 @@ export function LongTermGoals() {
     const handleCreate = (e: React.FormEvent) => {
         e.preventDefault();
         if (!newGoalTitle.trim()) return;
-        createGoalMutation.mutate(newGoalTitle);
+        createGoalMutation.mutate({ title: newGoalTitle, color: newGoalColor });
     };
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -583,6 +586,33 @@ export function LongTermGoals() {
                             value={newGoalTitle}
                             onChange={(e) => setNewGoalTitle(e.target.value)}
                         />
+                        <Select
+                            value={newGoalColor || "null"}
+                            onValueChange={(val) => setNewGoalColor(val === "null" ? null : val)}
+                        >
+                            <SelectTrigger className="w-[50px] px-2 bg-background/50 border-input">
+                                <div className="flex items-center justify-center w-full">
+                                    <div className={cn("w-4 h-4 rounded-full", {
+                                        "bg-muted border border-foreground/20": !newGoalColor,
+                                        "bg-rose-500": newGoalColor === 'red',
+                                        "bg-orange-500": newGoalColor === 'orange',
+                                        "bg-amber-400": newGoalColor === 'yellow',
+                                        "bg-blue-600": newGoalColor === 'blue',
+                                        "bg-violet-600": newGoalColor === 'purple',
+                                        "bg-fuchsia-500": newGoalColor === 'pink',
+                                        "bg-cyan-500": newGoalColor === 'cyan',
+                                    })} />
+                                </div>
+                            </SelectTrigger>
+                            <SelectContent align="end">
+                                <SelectItem value="null">Nessun Colore</SelectItem>
+                                {colorOptions.map(opt => (
+                                    <SelectItem key={opt.value} value={opt.value}>
+                                        {getLabel(opt.value)}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                         <Button type="submit" disabled={createGoalMutation.isPending}>
                             {createGoalMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                         </Button>
