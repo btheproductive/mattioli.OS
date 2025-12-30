@@ -316,7 +316,7 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
                             </div>
                             <CardDescription>Confronto anno per anno del volume di obiettivi e completamenti</CardDescription>
                         </CardHeader>
-                        <CardContent className="h-[400px]">
+                        <CardContent className="h-[300px] sm:h-[400px]">
                             <ResponsiveContainer width="100%" height="100%">
                                 <ComposedChart data={yearlyData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
@@ -344,7 +344,7 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
                                 <CardTitle>Performance per Categoria (Storico)</CardTitle>
                             </div>
                         </CardHeader>
-                        <CardContent className="h-[350px]">
+                        <CardContent className="h-[300px] sm:h-[350px]">
                             <ResponsiveContainer width="100%" height="100%">
                                 <RadarChart cx="50%" cy="50%" outerRadius="65%" data={radarData}>
                                     <PolarGrid stroke="#ffffff20" />
@@ -378,7 +378,7 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
                                 <CardTitle>Distribuzione Tipologie</CardTitle>
                             </div>
                         </CardHeader>
-                        <CardContent className="h-[350px]">
+                        <CardContent className="h-[300px] sm:h-[350px]">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={typeStats} layout="vertical" margin={{ left: 20 }}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" horizontal={true} vertical={false} />
@@ -405,7 +405,7 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
                             </div>
                             <CardDescription>Aggregato di tutti gli anni: in quale trimestre rendi meglio?</CardDescription>
                         </CardHeader>
-                        <CardContent className="h-[350px]">
+                        <CardContent className="h-[300px] sm:h-[350px]">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={seasonalData}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
@@ -431,7 +431,7 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
                             </div>
                             <CardDescription>Successo medio per mese: scopri il tuo ritmo ideale</CardDescription>
                         </CardHeader>
-                        <CardContent className="h-[350px]">
+                        <CardContent className="h-[300px] sm:h-[350px]">
                             <ResponsiveContainer width="100%" height="100%">
                                 <LineChart data={monthlyHistoricalData}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
@@ -464,7 +464,7 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
                             </div>
                             <CardDescription>Come sono cambiati i tuoi focus nel corso degli anni</CardDescription>
                         </CardHeader>
-                        <CardContent className="h-[400px]">
+                        <CardContent className="h-[300px] sm:h-[400px]">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={categoryEvolutionData}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
@@ -664,7 +664,7 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
                         </div>
                         <CardDescription>Confronto tra obiettivi pianificati e completati nel tempo</CardDescription>
                     </CardHeader>
-                    <CardContent className="h-[350px]">
+                    <CardContent className="h-[300px] sm:h-[350px]">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={monthlyData}>
                                 <defs>
@@ -700,7 +700,7 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
                         </div>
                         <CardDescription>Tasso di successo per categoria</CardDescription>
                     </CardHeader>
-                    <CardContent className="h-[350px]">
+                    <CardContent className="h-[300px] sm:h-[350px]">
                         <ResponsiveContainer width="100%" height="100%">
                             <RadarChart cx="50%" cy="50%" outerRadius="65%" data={radarData}>
                                 <PolarGrid stroke="#ffffff20" />

@@ -68,13 +68,13 @@ const Stats = () => {
 
             {/* Charts Row 1: Trends & Radar */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="glass-panel rounded-3xl p-6 h-[400px] flex flex-col">
+                <div className="glass-panel rounded-3xl p-6 h-[300px] sm:h-[400px] flex flex-col">
                     <h3 className="text-lg font-display font-semibold mb-4">Trend Settimanale</h3>
                     <div className="flex-1 w-full min-h-0">
                         <TrendChart data={stats.trendData} />
                     </div>
                 </div>
-                <div className={cn("glass-panel rounded-3xl p-6 h-[400px] flex flex-col transition-all duration-300", isPrivacyMode && "blur-sm")}>
+                <div className={cn("glass-panel rounded-3xl p-6 h-[300px] sm:h-[400px] flex flex-col transition-all duration-300", isPrivacyMode && "blur-sm")}>
                     <h3 className="text-lg font-display font-semibold mb-4">Focus Abitudini</h3>
                     <div className="flex-1 w-full min-h-0">
                         <HabitRadar stats={stats.habitStats} />
@@ -119,24 +119,24 @@ const Stats = () => {
                                         </div>
                                     </div>
 
-                                    <div className="flex gap-4 sm:gap-8 text-sm text-muted-foreground w-full sm:w-auto justify-between sm:justify-end">
+                                    <div className="grid grid-cols-2 gap-4 sm:flex sm:gap-8 text-sm text-muted-foreground w-full sm:w-auto justify-between sm:justify-end mt-4 sm:mt-0">
                                         {criticalStat && criticalStat.worstDay !== 'N/A' && (
-                                            <div className="flex flex-col items-end hidden md:flex">
+                                            <div className="flex flex-col items-start sm:items-end p-2 sm:p-0 bg-white/5 sm:bg-transparent rounded-lg sm:rounded-none">
                                                 <span className="text-[10px] uppercase tracking-widest font-bold opacity-60 mb-0.5 text-destructive">Worst</span>
                                                 <span className="font-medium text-foreground">{criticalStat.worstDay}</span>
                                             </div>
                                         )}
-                                        <div className="flex flex-col items-end">
+                                        <div className="flex flex-col items-start sm:items-end p-2 sm:p-0 bg-white/5 sm:bg-transparent rounded-lg sm:rounded-none">
                                             <span className="text-[10px] uppercase tracking-widest font-bold opacity-60 mb-0.5 flex items-center gap-1">
                                                 <Trophy className="w-3 h-3 text-yellow-500" /> Best
                                             </span>
                                             <span className="font-mono text-xl font-bold text-foreground">{habit.longestStreak} <span className="text-xs font-sans font-normal opacity-50">gg</span></span>
                                         </div>
-                                        <div className="flex flex-col items-end">
+                                        <div className="flex flex-col items-start sm:items-end p-2 sm:p-0 bg-white/5 sm:bg-transparent rounded-lg sm:rounded-none">
                                             <span className="text-[10px] uppercase tracking-widest font-bold opacity-60 mb-0.5">Serie</span>
                                             <span className="font-mono text-xl font-bold text-foreground">{habit.currentStreak} <span className="text-xs font-sans font-normal opacity-50">gg</span></span>
                                         </div>
-                                        <div className="flex flex-col items-end">
+                                        <div className="flex flex-col items-start sm:items-end p-2 sm:p-0 bg-white/5 sm:bg-transparent rounded-lg sm:rounded-none">
                                             <span className="text-[10px] uppercase tracking-widest font-bold opacity-60 mb-0.5">Rate</span>
                                             <span className="font-mono text-xl font-bold text-foreground">{habit.completionRate}<span className="text-sm">%</span></span>
                                         </div>
