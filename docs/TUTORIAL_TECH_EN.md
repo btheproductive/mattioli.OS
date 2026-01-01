@@ -39,8 +39,10 @@ VITE_SUPABASE_ANON_KEY=your_anon_key
 ```
 
 > [!IMPORTANT]
-> Make sure to run the database migrations (you can find SQL files in the `/supabase` folder if available, or ask the author for the initial schema).
-
+> **Database Setup**: You will find a `schema.sql` file in the project root.
+> 1. Open the SQL Editor in your Supabase project.
+> 2. Copy and paste the entire content of `schema.sql`.
+> 3. Run the script to create all necessary tables and security policies.
 ### 4. Start the App
 ```bash
 npm run dev

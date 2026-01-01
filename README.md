@@ -42,7 +42,7 @@ npm install
 npm run dev
 ```
 
-> **Note**: For full backend functionality, see the [Technical Setup Guide](./docs/TUTORIAL_TECH_EN.md).
+> **Note**: For full backend functionality, run the provided `schema.sql` in your Supabase project. See the [Technical Setup Guide](./docs/TUTORIAL_TECH_EN.md) for details.
 
 ---
 

@@ -39,8 +39,10 @@ VITE_SUPABASE_ANON_KEY=tua_chiave_anon
 ```
 
 > [!IMPORTANT]
-> Assicurati di eseguire le migrazioni del database (trovi i file SQL nella cartella `/supabase` se presenti, o contatta l'autore per lo schema iniziale).
-
+> **Setup del Database**: Troverai un file `schema.sql` nella root del progetto.
+> 1. Apri l'SQL Editor nel tuo progetto Supabase.
+> 2. Copia e incolla l'intero contenuto di `schema.sql`.
+> 3. Esegui lo script per creare tutte le tabelle e le policy di sicurezza necessarie.
 ### 4. Avvia l'App
 ```bash
 npm run dev
