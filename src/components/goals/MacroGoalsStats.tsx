@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
@@ -70,6 +71,14 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
             return allRows;
         },
     });
+
+    useEffect(() => {
+        const checkExpired = async () => {
+            const { error } = await supabase.rpc('check_and_fail_expired_goals');
+            if (error) console.error('Error checking expired goals:', error);
+        };
+        checkExpired();
+    }, []);
 
     if (isLoading) {
         return <div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;
@@ -167,18 +176,23 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
         // --- ALL TIME CALCULATIONS ---
 
         // Group by Year
-        const yearlyStatsMap: Record<number, { total: number; completed: number; rate: number }> = {};
+        const yearlyStatsMap: Record<number, { total: number; completed: number; failed: number; active: number; rate: number }> = {};
         timeBasedGoals.forEach(g => {
             if (g.year === null) return;
-            if (!yearlyStatsMap[g.year]) yearlyStatsMap[g.year] = { total: 0, completed: 0, rate: 0 };
+            if (!yearlyStatsMap[g.year]) yearlyStatsMap[g.year] = { total: 0, completed: 0, failed: 0, active: 0, rate: 0 };
+
             yearlyStatsMap[g.year].total++;
             if (g.status === 'completed') yearlyStatsMap[g.year].completed++;
+            else if (g.status === 'failed') yearlyStatsMap[g.year].failed++;
+            else yearlyStatsMap[g.year].active++;
         });
 
         const yearlyData = Object.entries(yearlyStatsMap).map(([y, s]) => ({
             year: y,
-            total: s.total,
+            total: s.total, // sum of components
             completed: s.completed,
+            failed: s.failed,
+            active: s.active,
             rate: Math.round((s.completed / s.total) * 100) || 0
         })).sort((a, b) => parseInt(a.year) - parseInt(b.year));
 
@@ -191,6 +205,8 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
             name: `Q${q}`,
             total: 0,
             completed: 0,
+            failed: 0,
+            active: 0,
             rate: 0
         }));
 
@@ -201,6 +217,8 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
                 const idx = q - 1;
                 seasonalData[idx].total++;
                 if (g.status === 'completed') seasonalData[idx].completed++;
+                else if (g.status === 'failed') seasonalData[idx].failed++;
+                else seasonalData[idx].active++;
             }
         });
 
@@ -214,6 +232,8 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
             monthIndex: i + 1,
             total: 0,
             completed: 0,
+            failed: 0,
+            active: 0,
             rate: 0
         }));
 
@@ -222,6 +242,8 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
                 const idx = g.month - 1;
                 monthlyHistoricalData[idx].total++;
                 if (g.status === 'completed') monthlyHistoricalData[idx].completed++;
+                else if (g.status === 'failed') monthlyHistoricalData[idx].failed++;
+                else monthlyHistoricalData[idx].active++;
             }
         });
 
@@ -336,8 +358,9 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
                                         cursor={{ fill: '#ffffff05' }}
                                     />
                                     <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                                    <Bar yAxisId="left" dataKey="total" name="Totale Obiettivi" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={40} fillOpacity={0.8} />
-                                    <Bar yAxisId="left" dataKey="completed" name="Completati" fill="#10b981" radius={[4, 4, 0, 0]} barSize={40} fillOpacity={0.8} />
+                                    <Bar yAxisId="left" dataKey="active" stackId="a" name="Attivi" fill="#3b82f6" radius={[0, 0, 4, 4]} barSize={40} fillOpacity={0.8} />
+                                    <Bar yAxisId="left" dataKey="failed" stackId="a" name="Falliti" fill="#ef4444" radius={[0, 0, 0, 0]} barSize={40} fillOpacity={0.8} />
+                                    <Bar yAxisId="left" dataKey="completed" stackId="a" name="Completati" fill="#10b981" radius={[4, 4, 0, 0]} barSize={40} fillOpacity={0.8} />
                                     <Line yAxisId="right" type="monotone" dataKey="rate" name="Tasso Successo %" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
                                 </ComposedChart>
                             </ResponsiveContainer>
@@ -423,8 +446,10 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
                                         contentStyle={{ backgroundColor: '#1f1f1f', border: '1px solid #333', color: '#fff', borderRadius: '8px' }}
                                         cursor={{ fill: '#ffffff05' }}
                                     />
-                                    <Bar dataKey="total" name="Totale" fill="#f59e0b" radius={[4, 4, 0, 0]} barSize={30} fillOpacity={0.6} />
-                                    <Bar dataKey="completed" name="Completati" fill="#10b981" radius={[4, 4, 0, 0]} barSize={30} />
+                                    <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                                    <Bar dataKey="active" stackId="a" name="Attivi" fill="#3b82f6" radius={[0, 0, 4, 4]} barSize={30} fillOpacity={0.6} />
+                                    <Bar dataKey="failed" stackId="a" name="Falliti" fill="#f59e0b" radius={[0, 0, 0, 0]} barSize={30} fillOpacity={0.8} />
+                                    <Bar dataKey="completed" stackId="a" name="Completati" fill="#10b981" radius={[4, 4, 0, 0]} barSize={30} />
                                 </BarChart>
                             </ResponsiveContainer>
                         </CardContent>
@@ -523,6 +548,8 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
         monthIndex: i + 1,
         total: 0,
         completed: 0,
+        failed: 0,
+        active: 0,
         rate: 0,
         cumulativeTotal: 0,
         cumulativeCompleted: 0,
@@ -539,6 +566,8 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
 
         monthlyData[mIdx].total++;
         if (g.status === 'completed') monthlyData[mIdx].completed++;
+        else if (g.status === 'failed') monthlyData[mIdx].failed++;
+        else monthlyData[mIdx].active++;
     });
 
     monthlyData.forEach(d => {
