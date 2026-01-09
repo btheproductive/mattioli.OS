@@ -74,7 +74,7 @@ export function MemoModal() {
                 <Button
                     variant="outline"
                     size="icon"
-                    className="h-9 w-9 sm:h-9 sm:w-9"
+                    className="h-10 w-10 sm:h-9 sm:w-9"
                     title="Memo / Appunti"
                 >
                     <FileText className="h-4 w-4" />

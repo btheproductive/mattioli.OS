@@ -7,6 +7,7 @@ import { HabitRadar } from '@/components/stats/HabitRadar';
 import { DayOfWeekChart } from '@/components/stats/DayOfWeekChart';
 import { PeriodComparison } from '@/components/stats/PeriodComparison';
 import { CriticalAnalysis } from '@/components/stats/CriticalAnalysis';
+import { MoodCorrelationChart } from '@/components/stats/MoodCorrelationChart';
 import { Trophy } from 'lucide-react';
 import { usePrivacy } from '@/context/PrivacyContext';
 import { cn } from '@/lib/utils';
@@ -47,6 +48,11 @@ const Stats = () => {
                     }}
                     bestHabit={bestHabit || undefined}
                 />
+            </div>
+
+            {/* Mood & Energy Correlation - High Visibility */}
+            <div className={cn("transition-all duration-300", isPrivacyMode && "blur-sm")}>
+                <MoodCorrelationChart />
             </div>
 
             {/* Heatmap - Full Width */}

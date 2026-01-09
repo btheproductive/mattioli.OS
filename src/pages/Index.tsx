@@ -23,9 +23,16 @@ import {
   AlertDialogTrigger,
 
 } from "@/components/ui/alert-dialog";
-import { LayoutGrid, Calendar, ListTodo, Download, Trash2, Eye, EyeOff } from 'lucide-react';
+import { LayoutGrid, Calendar, ListTodo, Download, Trash2, Eye, EyeOff, Wifi, WifiOff, AlertTriangle, HeartPulse, Circle } from 'lucide-react';
+import { MoodInput } from '@/components/mood/MoodInput';
+import { useSystemStatus } from '@/hooks/useSystemStatus';
+import { useTodaysMood } from '@/hooks/useMoods';
+import { cn } from '@/lib/utils';
+import { Drawer, DrawerContent, DrawerTrigger, DrawerHeader, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
 
 const Index = () => {
+  const { status, latency } = useSystemStatus();
+  const { data: todaysMood } = useTodaysMood();
   const {
     goals,
     logs: records, // Alias to keep prop compatibility
@@ -122,6 +129,39 @@ const Index = () => {
             </div>
 
             <div className="pt-0 lg:pt-4 border-t-0 lg:border-t border-white/5 flex gap-2 justify-end lg:justify-start">
+
+              <div className="lg:hidden mr-auto relative">
+                <Drawer shouldScaleBackground={false}>
+                  <DrawerTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className={cn(
+                        "h-10 w-10 sm:h-9 sm:w-9 border-primary/20 bg-primary/5 transition-all",
+                        !todaysMood ? "text-primary border-primary/40 shadow-[0_0_10px_-3px_rgba(255,255,255,0.1)]" : "text-muted-foreground"
+                      )}
+                    >
+                      <HeartPulse className={cn("h-4 w-4", !todaysMood && "animate-pulse")} />
+                      {/* Notification Dot */}
+                      {!todaysMood && (
+                        <span className="absolute top-2 right-2.5 h-1.5 w-1.5 rounded-full bg-red-500 shadow-[0_0_8px_2px_rgba(239,68,68,0.5)] animate-pulse" />
+                      )}
+                    </Button>
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <div className="mx-auto w-full max-w-sm">
+                      <DrawerHeader>
+                        <DrawerTitle>Daily Check-in</DrawerTitle>
+                        <DrawerDescription>Traccia il tuo umore ed energia.</DrawerDescription>
+                      </DrawerHeader>
+                      <div className="p-4 pb-8">
+                        <MoodInput />
+                      </div>
+                    </div>
+                  </DrawerContent>
+                </Drawer>
+              </div>
+
               <MemoModal />
               <HabitSettings
                 habits={goals}
@@ -133,7 +173,7 @@ const Index = () => {
               <Button
                 variant="outline"
                 size="icon"
-                className="h-8 w-8 sm:h-9 sm:w-9"
+                className="h-10 w-10 sm:h-9 sm:w-9"
                 onClick={handleExport}
                 title="Esporta dati CSV"
               >
@@ -145,7 +185,7 @@ const Index = () => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 sm:h-9 sm:w-9 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border-red-500/20"
+                    className="h-10 w-10 sm:h-9 sm:w-9 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border-red-500/20"
                     title="Hard Reset (Elimina tutto)"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -175,17 +215,37 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Mini Stats / Quote (Placeholder for now) */}
-          <div className="glass-card p-6 rounded-2xl hidden lg:block">
-            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-widest mb-2">Status</h3>
+          {/* Mini Stats / Quote */}
+          <div className="glass-card p-6 rounded-2xl hidden lg:block transition-colors duration-300">
+            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-widest mb-2 flex items-center justify-between">
+              System Status
+              {status === 'active' && <Wifi className="w-4 h-4 text-green-500" />}
+              {status === 'offline' && <WifiOff className="w-4 h-4 text-yellow-500" />}
+              {status === 'error' && <AlertTriangle className="w-4 h-4 text-red-500" />}
+            </h3>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold font-mono-nums text-primary">Active</span>
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span className={cn(
+                "text-2xl font-bold font-mono-nums transition-colors",
+                status === 'active' ? "text-primary" :
+                  status === 'offline' ? "text-yellow-500" : "text-red-500"
+              )}>
+                {status === 'active' ? 'Online' : status === 'offline' ? 'Offline' : 'Error'}
+              </span>
+              <span className={cn(
+                "w-2 h-2 rounded-full animate-pulse",
+                status === 'active' ? "bg-green-500" :
+                  status === 'offline' ? "bg-yellow-500" : "bg-red-500"
+              )} />
             </div>
-            <p className="text-xs text-muted-foreground mt-4">
-              Mattioli.OS v1.0<br />
-              System Optimized
+            <p className="text-xs text-muted-foreground mt-4 flex justify-between items-center">
+              <span>Mattioli.OS v4.1</span>
+              {latency && <span className="font-mono opacity-50">{latency}ms</span>}
             </p>
+          </div>
+
+          {/* Mood Input - User Friendly & Professional */}
+          <div className="hidden lg:block">
+            <MoodInput />
           </div>
         </div>
 
