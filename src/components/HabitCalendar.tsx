@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { format } from 'date-fns';
+import { format, isSameDay, subDays } from 'date-fns';
 import { ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -209,6 +209,7 @@ export function HabitCalendar({ habits, records, onToggleHabit, isPrivacyMode = 
                 records={records}
                 onToggleHabit={(habitId) => selectedDate && onToggleHabit(selectedDate, habitId)}
                 isPrivacyMode={isPrivacyMode}
+                readonly={selectedDate ? !(isSameDay(selectedDate, new Date()) || (isSameDay(selectedDate, subDays(new Date(), 1)) && new Date().getHours() < 12)) : true}
             />
         </>
     );
