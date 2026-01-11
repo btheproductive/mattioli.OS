@@ -138,7 +138,7 @@ const Stats = () => {
                     {stats.habitStats.length === 0 ? (
                         <p className="text-muted-foreground text-center py-8">Nessuna abitudine tracciata ancora.</p>
                     ) : (
-                        stats.habitStats.map(habit => {
+                        [...stats.habitStats].sort((a, b) => b.completionRate - a.completionRate).map(habit => {
                             const criticalStat = stats.criticalHabits.find(c => c.habitId === habit.id);
                             return (
                                 <div key={habit.id} className="glass-card rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group">

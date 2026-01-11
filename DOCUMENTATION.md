@@ -35,3 +35,7 @@
 - **Files Modified**: `src/pages/Index.tsx`, `src/components/HabitCalendar.tsx`
 - **Additional Fix**: Aggiunto `grid-template-rows: repeat(numRows, 1fr)` dinamico per forzare tutte le righe a distribuirsi uniformemente nello spazio disponibile.
 - **Layout Fix**: Modificato `Layout.tsx` per usare `h-dvh overflow-hidden` su mobile, impedendo lo scroll della pagina. Il calendario ora è vincolato all'altezza viewport.
+
+## 2026-01-11 - Stats Page Sorting
+
+- **Dettagli Abitudini**: Ora ordinato per "Rate" (Performance globale) in ordine decrescente.
