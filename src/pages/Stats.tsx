@@ -159,7 +159,8 @@ const Stats = () => {
             const status = logs[dateStr]?.[selectedGoal.id];
             return {
                 date: format(day, 'dd/MM'),
-                value: status === 'done' ? 100 : 0
+                value: status === 'done' ? 100 : 0,
+                status: status || null
             };
         });
 
@@ -398,8 +399,8 @@ const Stats = () => {
                                             key={i}
                                             className="aspect-square rounded-md sm:rounded-lg transition-all duration-300 hover:scale-110"
                                             style={{
-                                                backgroundColor: d.value > 0 ? selectedGoal.color : 'rgba(255,255,255,0.1)',
-                                                opacity: d.value > 0 ? 1 : 0.4
+                                                backgroundColor: d.status === 'done' ? '#11FF00' : d.status === 'missed' ? '#FF0000' : 'rgba(255,255,255,0.1)',
+                                                opacity: d.status ? 1 : 0.4
                                             }}
                                             title={d.date}
                                         />
@@ -407,7 +408,7 @@ const Stats = () => {
                                 </div>
                                 <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
                                     <div className="flex items-center gap-1">
-                                        <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: selectedGoal.color }} />
+                                        <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#11FF00' }} />
                                         <span>Completato</span>
                                     </div>
                                     <div className="flex items-center gap-1">
@@ -431,7 +432,7 @@ const Stats = () => {
                                             key={i}
                                             className="w-3 h-3 rounded-sm transition-all"
                                             style={{
-                                                backgroundColor: d.count === 1 ? selectedGoal.color : d.count === -1 ? '#ef4444' : 'rgba(255,255,255,0.05)'
+                                                backgroundColor: d.count === 1 ? '#11FF00' : d.count === -1 ? '#FF0000' : 'rgba(255,255,255,0.05)'
                                             }}
                                             title={`${d.date}: ${d.count === 1 ? 'Completato' : d.count === -1 ? 'Mancato' : 'Non tracciato'}`}
                                         />
@@ -439,7 +440,7 @@ const Stats = () => {
                                 </div>
                                 <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
                                     <div className="flex items-center gap-1">
-                                        <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: selectedGoal.color }} />
+                                        <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#11FF00' }} />
                                         <span>Completato</span>
                                     </div>
                                     <div className="flex items-center gap-1">
@@ -467,7 +468,7 @@ const Stats = () => {
                                                     className="absolute bottom-0 left-0 right-0 transition-all duration-500 rounded-t"
                                                     style={{
                                                         height: `${d.rate}%`,
-                                                        backgroundColor: d.rate >= 70 ? selectedGoal.color : d.rate >= 40 ? '#f59e0b' : '#ef4444'
+                                                        backgroundColor: d.rate >= 70 ? '#11FF00' : d.rate >= 40 ? '#f59e0b' : '#FF0000'
                                                     }}
                                                 />
                                             </div>

@@ -1,81 +1,35 @@
-# Documentation Log
+# Documentation - Update Habit Statistics Colors
 
-## [Current Date] - Documentation Overhaul (Excellence Update)
-- **Premium README.md**: Redesigned with:
-  - Centralized "Landing Page" header.
-  - "Quick Start" command block.
-  - Comparison Table (Life OS vs Competitors).
-  - Collapsible Feature Sections for cleaner UI.
-- **Technical Deep Dive v2**:
-  - Added **Mermaid.js** diagrams for System Architecture and Auth Flow.
-  - Clarified State Management decisions.
-- **New Standard Files**:
-  - `docs/CONTRIBUTING.md`: Guidelines for open source contribution.
-  - `docs/TROUBLESHOOTING.md`: Common error resolution guide.
-  - `docs/assets/Daily Tasks view mensile.png`: Main dashboard preview.
-  - `docs/assets/...`: Comprehensive screenshot gallery for Daily Tasks and Macro Goals.
-- **Asset Requests**: Updated `TO_SIMO_DO.md` to request GIFs for higher visual impact.
-- **UI Improvements**:
-  - **Calendar**: Fixed desktop responsive height and removed ghost tabs layout issues.
-  - **Export**: Added confirmation dialog for data export.
-  - **Layout**: Optimized sidebar alignment, restored natural flow, and tightened bottom spacing.
-  - **Tabs**: Fixed visual alignment of tab triggers and selection highlight.
-  - **Weekly View**: Aligned layout behavior with monthly view, implementing dynamic vertical stretching for habit blocks.
-  - **Mobile Layout**: Implemented "Native App Shell". Finalized mobile calendar with `shrink-wrap` strategy (`h-auto`, `flex-none`). This forces the calendar card to occupy only the exact vertical space needed by its content, eliminating internal black voids while maintaining perfect cell proportions.
-  - **Edge-to-Edge**: Removed bottom padding (`pb-4`) on mobile container to ensure the calendar box sits flush with the bottom of the content area, eliminating the "empty black block".
-  - **Annual View**: Replaced "Daily" view with a new "Annual" view (`AnnualView.tsx`), offering a 12-month heatmap grid to visualize habit consistency over the entire year.
+## Overview
+Updated the habit statistics page to enforce a consistent color scheme for single habit views. Regardless of the habit's configured color, the statistics now use Green for completion and Red for missed/incomplete status to provide clear visual feedback.
 
-## 2026-01-11 - Mobile Calendar Full-Screen Fix
+## Implementation Details
 
-- **Problem**: Il calendario (mensile e settimanale) non occupava tutto lo schermo su iPhone, lasciando ampio spazio nero vuoto.
-- **Root Cause**: I container usavano `flex-none` e `h-auto` su mobile invece di espandersi verticalmente.
-- **Fix Applied**:
-  - `Index.tsx`: Container cambiato da `flex-none lg:flex-1` a `flex-1` sempre.
-  - `HabitCalendar.tsx`: Rimosso `aspect-square` dalle celle, aggiunto `h-full` al container e `flex-1` alla griglia.
-- **Files Modified**: `src/pages/Index.tsx`, `src/components/HabitCalendar.tsx`
-- **Additional Fix**: Aggiunto `grid-template-rows: repeat(numRows, 1fr)` dinamico per forzare tutte le righe a distribuirsi uniformemente nello spazio disponibile.
-- **Layout Fix**: Modificato `Layout.tsx` per usare `h-dvh overflow-hidden` su mobile, impedendo lo scroll della pagina. Il calendario ora è vincolato all'altezza viewport.
+### File: `src/pages/Stats.tsx`
 
-## 2026-01-11 - Stats Page Sorting
+#### 1. Trend Data Logic
+-   Modified the `trendData` mapping to include the `status` field explicitly.
+-   This allows the UI to differentiate between 'done' and 'missed' states in the trend chart.
 
-- **Dettagli Abitudini**: Ora ordinato per "Rate" (Performance globale) in ordine decrescente.
-- **Layout Redesign**: Implementata struttura a 4 tabs (Panoramica, Trend, Analisi, Abitudini) per ridurre lo scroll e migliorare la navigabilità.
+#### 2. Visual Updates
+-   **Trend Chart ("Trend Ultimi 30 Giorni")**:
+    -   Updated background color logic:
+        -   `status === 'done'` -> `#11FF00` (Green)
+        -   `status === 'missed'` -> `#FF0000` (Red)
+    -   Updated the legend to show the fixed Green color for "Completato".
 
-## 2026-01-11 - Habit Edit Feature
+-   **Annual Calendar ("Calendario Annuale")**:
+    -   Updated heatmap color logic:
+        -   `count === 1` (Done) -> `#11FF00` (Green)
+        -   `count === -1` (Missed) -> `#FF0000` (Red)
+    -   Updated the legend to match.
 
-- **Nuova funzionalità**: Modifica nome e colore delle abitudini esistenti nel popup "Gestisci Abitudini"
-- **ColorPicker professionale**: Nuovo componente `color-picker.tsx` con:
-  - Ruota colori interattiva (react-colorful)
-  - Input hex diretto
-  - Preset colori rapidi
-- **Mutation updateGoal**: Aggiunta in `useGoals.ts` per aggiornare solo title e color (dati storici intatti)
-- **HabitSettings UI**: Modalità edit inline con icona Pencil accanto a Trash per ogni abitudine
-- **Files Modificati**: 
-  - `src/components/ui/color-picker.tsx` [NEW]
-  - `src/hooks/useGoals.ts`
-  - `src/components/HabitSettings.tsx`
-  - `src/pages/Index.tsx`
+-   **Performance Chart ("Performance per Giorno")**:
+    -   Updated bar color logic:
+    -   Updated bar color logic:
+        -   High performance (`rate >= 70%`) -> `#11FF00` (Green)
+        -   Medium performance (`rate >= 40%`) -> `#f59e0b` (Orange - unchanged)
+        -   Low performance -> `#FF0000` (Red)
 
-## 2026-01-11 - Desktop Layout Overlap Fix
-
-- **Problema**: Sulla home page desktop, il riquadro "Protocollo" veniva spostato verso il basso e sovrapposto dal riquadro "SYSTEM STATUS".
-- **Root Cause**: Il pannello Protocollo aveva le classi `lg:sticky lg:top-24` che lo rendevano "sticky" durante lo scroll, causando conflitti di posizionamento con i pannelli sottostanti.
-- **Fix Applicato**: Rimossa la proprietà sticky dal pannello Protocollo in `Index.tsx`.
-- **File Modificato**: `src/pages/Index.tsx` (riga 111)
-
-## 2026-01-11 - Goal-Specific Stats Filter
-
-- **Goal Selector**: Aggiunto dropdown per selezionare goal specifico o "Tutti"
-- **Vista Globale**: Mantiene le 4 tabs originali per statistiche aggregate
-- **Vista Goal Singolo**: 4 nuove tabs dedicate:
-  - **Overview**: KPI (streak, record, rate, mancati) + trend 30 giorni
-  - **Calendario**: Heatmap annuale colorata (verde=done, rosso=missed)
-  - **Performance**: Grafico per giorno della settimana + worst day analysis
-  - **Miglioramento**: Serie negative, streak interrotti, suggerimenti personalizzati
-
-## 2026-01-11 - Full Screen Layout Fix
-
-- **Problem**: Lower part of the screen was not being utilized on the main dashboard, leaving empty space.
-- **Root Cause**: The main grid container in `Index.tsx` had `lg:h-auto`, preventing it from expanding to fill the available height.
-- **Fix Applied**: Changed container class to `lg:h-full` to ensure it takes up all available vertical space alongside `min-h-dvh` in the layout.
-- **File Modified**: `src/pages/Index.tsx`
+## Justification
+This change ensures that positive reinforcement (Green) and attention to improvement areas (Red) are consistent across all habits, improving readability and user experience in the detailed statistics view.
