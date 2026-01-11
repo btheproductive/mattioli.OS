@@ -11,13 +11,32 @@ export const DEFAULT_CATEGORY_LABELS: Record<string, string> = {
     purple: 'Viola',
     pink: 'Rosa',
     cyan: 'Ciano',
-    green: 'Verde',
+    // green removed as per previous context, but keeping key if needed or strictly following user prefs
 };
+
+// Map legacy tailwind classes to approximate hex/hsl for fallback if needed, 
+// or simpler: just assume keys if no custom color is set.
+// Actually, let's export the default color values too so we can use them effectively.
+export const DEFAULT_CATEGORY_COLORS: Record<string, string> = {
+    red: "hsl(0 65% 55%)",       // rose-500 approx
+    orange: "hsl(25 60% 45%)",    // orange-500
+    yellow: "hsl(45 90% 45%)",    // amber-400
+    blue: "hsl(220 70% 50%)",     // blue-600
+    purple: "hsl(270 70% 50%)",   // violet-600
+    pink: "hsl(330 70% 50%)",     // fuchsia-500
+    cyan: "hsl(170 70% 40%)",     // cyan-500
+};
+
+export interface CategoryMapping {
+    label: string;
+    color: string;
+    archived?: boolean;
+}
 
 export interface GoalCategorySettings {
     id: string;
     user_id: string;
-    mappings: Record<string, string>;
+    mappings: Record<string, string | CategoryMapping>;
 }
 
 export function useGoalCategories() {
@@ -35,7 +54,7 @@ export function useGoalCategories() {
                 .eq('user_id', user.id)
                 .single();
 
-            if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+            if (error && error.code !== 'PGRST116') {
                 console.error('Error fetching category settings:', error);
             }
             return data as GoalCategorySettings | null;
@@ -43,32 +62,31 @@ export function useGoalCategories() {
     });
 
     const updateSettingsMutation = useMutation({
-        mutationFn: async (newMappings: Record<string, string>) => {
+        mutationFn: async (newMappings: Record<string, string | CategoryMapping>) => {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error('Not authenticated');
 
-            // Check if row exists, if not create, else update
-            const { data: existing } = await supabase
-                .from('goal_category_settings')
+            const { data: existing } = await (supabase
+                .from('goal_category_settings') as any)
                 .select('id')
                 .eq('user_id', user.id)
                 .single();
 
             if (existing) {
-                const { error } = await supabase
-                    .from('goal_category_settings')
+                const { error } = await (supabase
+                    .from('goal_category_settings') as any)
                     .update({ mappings: newMappings })
                     .eq('id', existing.id);
                 if (error) throw error;
             } else {
-                const { error } = await supabase
-                    .from('goal_category_settings')
+                const { error } = await (supabase
+                    .from('goal_category_settings') as any)
                     .insert({ user_id: user.id, mappings: newMappings });
                 if (error) throw error;
             }
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['longTermGoals'] }); // Invalidate goals to refresh colors if needed
+            queryClient.invalidateQueries({ queryKey: ['longTermGoals'] });
             queryClient.invalidateQueries({ queryKey: ['goalCategorySettings'] });
             toast.success('Categorie aggiornate con successo');
         },
@@ -77,14 +95,56 @@ export function useGoalCategories() {
         }
     });
 
+    // Returns ALL labels (including archived) for historical display
     const categoryLabels = useMemo(() => {
-        return { ...DEFAULT_CATEGORY_LABELS, ...settings?.mappings };
+        const mappingLabels: Record<string, string> = {};
+        if (settings?.mappings) {
+            Object.entries(settings.mappings).forEach(([key, val]) => {
+                if (typeof val === 'string') {
+                    mappingLabels[key] = val;
+                } else {
+                    mappingLabels[key] = val.label;
+                }
+            });
+        }
+        return { ...DEFAULT_CATEGORY_LABELS, ...mappingLabels };
     }, [settings]);
 
-    const getLabel = (color: string | null) => {
-        if (!color) return 'Generale';
-        const customLabel = settings?.mappings?.[color];
-        return customLabel || DEFAULT_CATEGORY_LABELS[color] || color;
+    // Returns ONLY ACTIVE labels for selection dropdowns
+    const activeCategoryLabels = useMemo(() => {
+        const mappingLabels: Record<string, string> = {};
+        if (settings?.mappings) {
+            Object.entries(settings.mappings).forEach(([key, val]) => {
+                const isArchived = typeof val !== 'string' && val.archived;
+                if (!isArchived) {
+                    if (typeof val === 'string') {
+                        mappingLabels[key] = val;
+                    } else {
+                        mappingLabels[key] = val.label;
+                    }
+                }
+            });
+        }
+        return { ...DEFAULT_CATEGORY_LABELS, ...mappingLabels };
+    }, [settings]);
+
+
+    const getLabel = (colorKey: string | null) => {
+        if (!colorKey) return 'Generale';
+        const entry = settings?.mappings?.[colorKey];
+        if (typeof entry === 'string') return entry;
+        if (entry?.label) return entry.label;
+        return DEFAULT_CATEGORY_LABELS[colorKey] || colorKey;
+    };
+
+    const getColor = (colorKey: string | null) => {
+        if (!colorKey) return null;
+        const entry = settings?.mappings?.[colorKey];
+        if (entry && typeof entry !== 'string') {
+            // Even if archived, we return the color for historical display
+            if (entry.color) return entry.color;
+        }
+        return DEFAULT_CATEGORY_COLORS[colorKey] || null;
     };
 
     return {
@@ -92,6 +152,8 @@ export function useGoalCategories() {
         isLoading,
         updateSettings: updateSettingsMutation.mutate,
         getLabel,
-        categoryLabels
+        getColor,
+        categoryLabels,
+        activeCategoryLabels
     };
 }

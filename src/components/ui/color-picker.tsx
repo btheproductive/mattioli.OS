@@ -86,9 +86,10 @@ interface ColorPickerProps {
     value: string;
     onChange: (color: string) => void;
     className?: string;
+    showValueLabel?: boolean;
 }
 
-export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
+export function ColorPicker({ value, onChange, className, showValueLabel = true }: ColorPickerProps) {
     const [hexValue, setHexValue] = useState(() => hslToHex(value));
     const [open, setOpen] = useState(false);
 
@@ -114,6 +115,7 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
                     variant="outline"
                     className={cn(
                         "w-full justify-start gap-3 h-10 rounded-xl bg-black/20 border-white/10 hover:bg-white/5",
+                        !showValueLabel && "justify-center px-0 gap-0",
                         className
                     )}
                 >
@@ -121,7 +123,7 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
                         className="h-5 w-5 rounded-full shadow-[0_0_10px_currentColor] shrink-0"
                         style={{ backgroundColor: hexValue, color: hexValue }}
                     />
-                    <span className="font-mono text-sm uppercase tracking-wider">{hexValue}</span>
+                    {showValueLabel && <span className="font-mono text-sm uppercase tracking-wider">{hexValue}</span>}
                 </Button>
             </SheetTrigger>
             <SheetContent side="bottom" className="bg-[#0a0a0a]/95 backdrop-blur-2xl border-white/10">

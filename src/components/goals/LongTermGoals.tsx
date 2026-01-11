@@ -87,34 +87,35 @@ export function LongTermGoals() {
         };
     }, []);
 
-    const { getLabel } = useGoalCategories();
+    const { getLabel, getColor, categoryLabels, activeCategoryLabels } = useGoalCategories();
     const { isPrivacyMode } = usePrivacy();
 
-    // Dynamic color object creation to include labels
-    const getGoalColorClass = (colorValue: string | null) => {
-        const staticColors = [
-            { value: null, class: 'bg-card/20 border-white/5' },
-            { value: 'red', class: 'bg-rose-500/15 border-rose-500/30 hover:bg-rose-500/25' },
-            { value: 'orange', class: 'bg-orange-500/15 border-orange-500/30 hover:bg-orange-500/25' },
-            { value: 'yellow', class: 'bg-amber-400/15 border-amber-400/30 hover:bg-amber-400/25' },
-            { value: 'blue', class: 'bg-blue-600/15 border-blue-600/30 hover:bg-blue-600/25' },
-            { value: 'purple', class: 'bg-violet-600/15 border-violet-600/30 hover:bg-violet-600/25' },
-            { value: 'pink', class: 'bg-fuchsia-500/15 border-fuchsia-500/30 hover:bg-fuchsia-500/25' },
-            { value: 'cyan', class: 'bg-cyan-500/15 border-cyan-500/30 hover:bg-cyan-500/25' },
-        ];
-        return staticColors.find(c => c.value === colorValue)?.class || "bg-card/20 border-white/5 hover:bg-card/40";
+    // Helper to generate dynamic styles based on category color
+    const getGoalStyle = (colorKey: string | null) => {
+        const color = getColor(colorKey);
+        if (!color) return {};
+
+        // Assume HSL format from system
+        if (color.startsWith('hsl')) {
+            return {
+                backgroundColor: color.replace(')', ' / 0.15)'),
+                borderColor: color.replace(')', ' / 0.3)'),
+            };
+        }
+        return { borderColor: color }; // Fallback
     };
 
-    const colorOptions = [
-        { value: "red", bg: "bg-rose-500" },
-        { value: "orange", bg: "bg-orange-500" },
-        { value: "yellow", bg: "bg-amber-400" },
-        { value: "green", bg: "bg-emerald-500" }, // Keep green in option data but filter if needed? No, user wanted green removed.
-        { value: "blue", bg: "bg-blue-600" },
-        { value: "purple", bg: "bg-violet-600" },
-        { value: "pink", bg: "bg-fuchsia-500" },
-        { value: "cyan", bg: "bg-cyan-500" },
-    ].filter(c => c.value !== 'green'); // Ensure green is removed as per previous request
+    // Helper for pure color (no opacity)
+    const getGoalColor = (colorKey: string | null) => {
+        const color = getColor(colorKey);
+        return color || 'transparent'; // or some default
+    };
+
+    const getGoalColorClass = (colorValue: string | null) => {
+        // Keep base classes, but remove specific color classes as they will be overridden by style
+        return "bg-card/20 border-white/5 hover:bg-card/40 relative overflow-hidden";
+    };
+
 
 
     const quarters = [
@@ -123,6 +124,21 @@ export function LongTermGoals() {
         { value: 3, label: '3° Trimestre (Q3)' },
         { value: 4, label: '4° Trimestre (Q4)' },
     ];
+
+    // Sort keys: defaults first (in specific order if possible), then custom
+    // Use activeCategoryLabels to only show available options in dropdowns
+    const categoryKeys = Object.keys(activeCategoryLabels).sort((a, b) => {
+        // Simple sort: if one is default and other is not...
+        // Actually, relying on object order or simple alpha sort for now is fine,
+        // but maybe defaults should come first.
+        const defaults = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'cyan'];
+        const ia = defaults.indexOf(a);
+        const ib = defaults.indexOf(b);
+        if (ia !== -1 && ib !== -1) return ia - ib;
+        if (ia !== -1) return -1;
+        if (ib !== -1) return 1;
+        return a.localeCompare(b);
+    });
 
     const { data: goals, isLoading } = useQuery({
         queryKey: ['longTermGoals', view, selectedYear, selectedQuarter, selectedMonth, selectedWeek],
@@ -599,23 +615,23 @@ export function LongTermGoals() {
                         >
                             <SelectTrigger className="w-[50px] px-2 bg-background/50 border-input">
                                 <div className="flex items-center justify-center w-full">
-                                    <div className={cn("w-4 h-4 rounded-full", {
-                                        "bg-muted border border-foreground/20": !newGoalColor,
-                                        "bg-rose-500": newGoalColor === 'red',
-                                        "bg-orange-500": newGoalColor === 'orange',
-                                        "bg-amber-400": newGoalColor === 'yellow',
-                                        "bg-blue-600": newGoalColor === 'blue',
-                                        "bg-violet-600": newGoalColor === 'purple',
-                                        "bg-fuchsia-500": newGoalColor === 'pink',
-                                        "bg-cyan-500": newGoalColor === 'cyan',
-                                    })} />
+                                    <div
+                                        className="w-4 h-4 rounded-full border border-white/10"
+                                        style={{ backgroundColor: newGoalColor ? getGoalColor(newGoalColor) : 'transparent' }}
+                                    />
                                 </div>
                             </SelectTrigger>
                             <SelectContent align="end">
                                 <SelectItem value="null">Nessun Colore</SelectItem>
-                                {colorOptions.map(opt => (
-                                    <SelectItem key={opt.value} value={opt.value}>
-                                        {getLabel(opt.value)}
+                                {categoryKeys.map(key => (
+                                    <SelectItem key={key} value={key}>
+                                        <div className="flex items-center gap-2">
+                                            <div
+                                                className="w-3 h-3 rounded-full border border-white/10"
+                                                style={{ backgroundColor: getGoalColor(key) }}
+                                            />
+                                            {getLabel(key)}
+                                        </div>
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -691,6 +707,7 @@ export function LongTermGoals() {
                                                         ? "opacity-60 bg-destructive/5 border-destructive/10"
                                                         : (getGoalColorClass(goal.color))
                                             )}
+                                            style={effectiveStatus === 'active' ? getGoalStyle(goal.color) : {}}
                                         >
                                             <div
                                                 onClick={handleStatusToggle}
@@ -732,35 +749,52 @@ export function LongTermGoals() {
                                                     onValueChange={(val) => updateColorMutation.mutate({ id: goal.id, color: val === "null" ? null : val })}
                                                 >
                                                     <SelectTrigger className="w-[30px] h-[30px] p-0 border-0 bg-transparent focus:ring-0">
-                                                        <div className={cn("w-4 h-4 rounded-full", {
-                                                            "bg-white/20": !goal.color,
-                                                            "bg-rose-500": goal.color === 'red',
-                                                            "bg-orange-500": goal.color === 'orange',
-                                                            "bg-amber-400": goal.color === 'yellow',
-                                                            "bg-blue-600": goal.color === 'blue',
-                                                            "bg-violet-600": goal.color === 'purple',
-                                                            "bg-fuchsia-500": goal.color === 'pink',
-                                                            "bg-cyan-500": goal.color === 'cyan',
-                                                        })} />
+                                                        <div
+                                                            className="w-4 h-4 rounded-full border border-white/10"
+                                                            style={{ backgroundColor: goal.color ? getGoalColor(goal.color) : 'rgba(255,255,255,0.2)' }}
+                                                        />
                                                     </SelectTrigger>
                                                     <SelectContent align="end">
                                                         <SelectItem value="null">Nessun Colore</SelectItem>
-                                                        {colorOptions.map(opt => (
-                                                            <SelectItem key={opt.value} value={opt.value}>
-                                                                {getLabel(opt.value)}
+                                                        {categoryKeys.map(key => (
+                                                            <SelectItem key={key} value={key}>
+                                                                <div className="flex items-center gap-2">
+                                                                    <div
+                                                                        className="w-3 h-3 rounded-full border border-white/10"
+                                                                        style={{ backgroundColor: getGoalColor(key) }}
+                                                                    />
+                                                                    {getLabel(key)}
+                                                                </div>
                                                             </SelectItem>
                                                         ))}
                                                     </SelectContent>
                                                 </Select>
 
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="text-destructive hover:bg-destructive/10 hover:text-destructive h-8 w-8"
-                                                    onClick={() => deleteGoalMutation.mutate(goal.id)}
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </Button>
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="text-destructive hover:bg-destructive/10 hover:text-destructive h-8 w-8"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>Eliminare questo obiettivo?</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                Questa azione non può essere annullata. L'obiettivo verrà rimosso permanentemente.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>Annulla</AlertDialogCancel>
+                                                            <AlertDialogAction onClick={() => deleteGoalMutation.mutate(goal.id)}>
+                                                                Elimina
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
                                             </div>
                                         </div>
                                     </div>
