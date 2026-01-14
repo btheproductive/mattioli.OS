@@ -1,5 +1,6 @@
 import { useGoals } from '@/hooks/useGoals';
 import { useHabitStats, Timeframe } from '@/hooks/useHabitStats';
+import { useHabitMoodCorrelation } from '@/hooks/useHabitMoodCorrelation';
 import { StatsOverview } from '@/components/stats/StatsOverview';
 import { ActivityHeatmap } from '@/components/stats/ActivityHeatmap';
 import { TrendChart } from '@/components/stats/TrendChart';
@@ -8,7 +9,10 @@ import { DayOfWeekChart } from '@/components/stats/DayOfWeekChart';
 import { PeriodComparison } from '@/components/stats/PeriodComparison';
 import { CriticalAnalysis } from '@/components/stats/CriticalAnalysis';
 import { MoodCorrelationChart } from '@/components/stats/MoodCorrelationChart';
-import { Trophy, TrendingDown, AlertTriangle, Calendar, Target, MoveLeft, AlignLeft } from 'lucide-react';
+import { HabitMoodCorrelationChart } from '@/components/stats/HabitMoodCorrelationChart';
+import { MoodEnergyHabitMatrix } from '@/components/stats/MoodEnergyHabitMatrix';
+import { MoodEnergyInsights } from '@/components/stats/MoodEnergyInsights';
+import { Trophy, TrendingDown, AlertTriangle, Calendar, Target, MoveLeft, AlignLeft, Sparkles } from 'lucide-react';
 import { usePrivacy } from '@/context/PrivacyContext';
 import { cn } from '@/lib/utils';
 import { useMemo, useState } from 'react';
@@ -23,6 +27,7 @@ const Stats = () => {
     const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
     const stats = useHabitStats(goals, logs, trendTimeframe);
     const { isPrivacyMode } = usePrivacy();
+    const { correlations, insights } = useHabitMoodCorrelation(goals, logs);
 
     // Find selected goal
     const selectedGoal = useMemo(() => {
@@ -288,6 +293,12 @@ const Stats = () => {
                         <div className={cn("transition-all duration-300", isPrivacyMode && "blur-sm")}>
                             <CriticalAnalysis criticalHabits={stats.criticalHabits} />
                         </div>
+                        <div className={cn("transition-all duration-300", isPrivacyMode && "blur-sm")}>
+                            <MoodEnergyInsights insights={insights} />
+                        </div>
+                        <div className={cn("transition-all duration-300", isPrivacyMode && "blur-sm")}>
+                            <MoodEnergyHabitMatrix correlations={correlations} />
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                             <div className={cn("glass-panel rounded-3xl p-4 sm:p-6 h-[300px] sm:h-[350px] flex flex-col transition-all duration-300", isPrivacyMode && "blur-sm")}>
                                 <h3 className="text-base sm:text-lg font-display font-semibold mb-3">Focus Abitudini</h3>
@@ -357,11 +368,16 @@ const Stats = () => {
                 // SINGLE GOAL VIEW
                 selectedGoal && singleGoalStats && (
                     <Tabs defaultValue="overview" key={selectedGoalId} className="w-full">
-                        <TabsList className="grid w-full grid-cols-4 mb-4 shrink-0">
+                        <TabsList className="grid w-full grid-cols-5 mb-4 shrink-0">
                             <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
                             <TabsTrigger value="calendario" className="text-xs sm:text-sm">Calendario</TabsTrigger>
                             <TabsTrigger value="performance" className="text-xs sm:text-sm">Performance</TabsTrigger>
                             <TabsTrigger value="miglioramento" className="text-xs sm:text-sm">Miglioramento</TabsTrigger>
+                            <TabsTrigger value="mood-energia" className="text-xs sm:text-sm flex items-center gap-1">
+                                <Sparkles className="w-3 h-3" />
+                                <span className="hidden sm:inline">Mood & Energia</span>
+                                <span className="sm:hidden">M&E</span>
+                            </TabsTrigger>
                         </TabsList>
 
                         {/* Tab 1: Overview */}
@@ -555,6 +571,27 @@ const Stats = () => {
                                     )}
                                 </ul>
                             </div>
+                        </TabsContent>
+
+                        {/* Tab 5: Mood & Energia */}
+                        <TabsContent value="mood-energia" className="mt-0 space-y-6">
+                            {(() => {
+                                const habitCorrelation = correlations.find(c => c.habitId === selectedGoalId);
+                                if (!habitCorrelation) {
+                                    return (
+                                        <div className="glass-panel rounded-3xl p-8 text-center">
+                                            <Sparkles className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                                            <p className="text-muted-foreground">
+                                                Non ci sono abbastanza dati per analizzare la correlazione mood/energia.
+                                            </p>
+                                            <p className="text-sm text-muted-foreground mt-2">
+                                                Registra il tuo mood ed energia quotidianamente per vedere le correlazioni.
+                                            </p>
+                                        </div>
+                                    );
+                                }
+                                return <HabitMoodCorrelationChart correlation={habitCorrelation} />;
+                            })()}
                         </TabsContent>
                     </Tabs>
                 )
