@@ -43,10 +43,12 @@ const Index = () => {
     rawLogs,
     createGoal,
     updateGoal,
+    updateOrder,
     deleteGoal,
     toggleGoal,
     isDeleting,
     isUpdating,
+    isUpdatingOrder,
     resetAllData,
     isResetting
   } = useGoals();
@@ -186,6 +188,7 @@ const Index = () => {
                 habits={goals}
                 onAddHabit={createGoal}
                 onUpdateHabit={updateGoal}
+                onUpdateOrder={updateOrder}
                 onRemoveHabit={deleteGoal}
                 isDeleting={isDeleting}
                 isUpdating={isUpdating}

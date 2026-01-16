@@ -66,6 +66,7 @@ CREATE TABLE public.goals (
     frequency_days integer[],
     start_date timestamp with time zone NOT NULL,
     end_date timestamp with time zone,
+    display_order integer,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL
 );

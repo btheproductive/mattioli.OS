@@ -10,6 +10,7 @@ export interface Goal {
     start_date: string; // ISO Date "YYYY-MM-DD"
     end_date?: string | null; // ISO Date "YYYY-MM-DD"
     frequency_days?: number[]; // 1-7 (Mon-Sun)
+    display_order?: number; // Custom order position
     created_at: string;
     updated_at: string;
 }

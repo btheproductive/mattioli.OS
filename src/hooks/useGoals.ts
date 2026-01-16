@@ -9,18 +9,22 @@ export function useGoals() {
     const queryClient = useQueryClient();
 
     // 1. Fetch Goals
-    const { data: goals, isLoading: isLoadingGoals } = useQuery({
+    const { data: goals, isLoading: isLoadingGoals, refetch: refetchGoals } = useQuery({
         queryKey: ['goals'],
         queryFn: async () => {
+            console.log('Fetching goals from database...');
             const { data, error } = await supabase
                 .from('goals')
                 .select('*')
+                .order('display_order', { ascending: true, nullsFirst: false })
                 .order('created_at', { ascending: true });
 
             if (error) {
                 toast.error('Errore caricamento obiettivi');
                 throw error;
             }
+            console.log('Goals fetched:', data?.length, 'goals');
+            console.log('First 3 goals order:', data?.slice(0, 3).map((g: any) => ({ title: g.title, display_order: g.display_order })));
             return data as Goal[];
         },
     });
@@ -76,13 +80,26 @@ export function useGoals() {
                 throw new Error('Non sei autenticato. Effettua il login.');
             }
 
+            // Calculate next display_order
+            const { data: maxOrderData } = await supabase
+                .from('goals')
+                .select('display_order')
+                .eq('user_id', session.user.id)
+                .order('display_order', { ascending: false, nullsFirst: false })
+                .limit(1);
+
+            const nextOrder = (maxOrderData && maxOrderData.length > 0 && (maxOrderData[0] as any).display_order)
+                ? (maxOrderData[0] as any).display_order + 1
+                : 1;
+
             const { data, error } = await supabase
                 .from('goals')
                 .insert([{
                     title: newGoal.title!,
                     color: newGoal.color!,
                     start_date: newGoal.start_date || getLocalDateKey(new Date()),
-                    user_id: session.user.id
+                    user_id: session.user.id,
+                    display_order: nextOrder
                 }] as any)
                 .select()
                 .single();
@@ -294,6 +311,52 @@ export function useGoals() {
         },
     });
 
+    // UPDATE ORDER (for drag & drop)
+    const updateOrderMutation = useMutation({
+        mutationFn: async (reorderedGoals: { id: string; display_order: number }[]) => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                throw new Error('Non sei autenticato. Effettua il login.');
+            }
+
+            console.log('Updating order for goals:', reorderedGoals);
+
+            // Bulk update using Promise.all
+            const updates = reorderedGoals.map(async ({ id, display_order }) => {
+                const { data, error, count } = await (supabase
+                    .from('goals') as any)
+                    .update({ display_order })
+                    .eq('id', id)
+                    .eq('user_id', session.user.id);
+
+                if (error) {
+                    console.error(`Error updating goal ${id}:`, error);
+                    throw error;
+                }
+
+                console.log(`Updated goal ${id} to order ${display_order}:`, { data, count });
+
+                return { id, display_order, updated: true };
+            });
+
+            const results = await Promise.all(updates);
+            console.log('Order update completed:', results);
+        },
+        onSuccess: async () => {
+            console.log('Update successful, invalidating and refetching...');
+            await queryClient.invalidateQueries({ queryKey: ['goals'] });
+            // Explicitly refetch to ensure we get the new order
+            setTimeout(() => {
+                queryClient.refetchQueries({ queryKey: ['goals'] });
+            }, 100);
+            toast.success('Ordine salvato');
+        },
+        onError: (e: any) => {
+            console.error('Update order error:', e);
+            toast.error('Errore salvataggio ordine: ' + e.message);
+        }
+    });
+
     return {
         goals: activeGoals,
         allGoals: goals || [],
@@ -303,6 +366,8 @@ export function useGoals() {
         createGoal: createGoalMutation.mutate,
         updateGoal: updateGoalMutation.mutate,
         isUpdating: updateGoalMutation.isPending,
+        updateOrder: updateOrderMutation.mutate,
+        isUpdatingOrder: updateOrderMutation.isPending,
         deleteGoal: deleteGoalMutation.mutate,
         isDeleting: deleteGoalMutation.isPending,
         resetAllData: resetAllDataMutation.mutate,

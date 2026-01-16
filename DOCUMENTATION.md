@@ -210,6 +210,425 @@ Il documento utilizza:
 
 ---
 
+### File Coinvolti
+- `/Users/simo/Downloads/DEV/habit-tracker/src/context/AIContext.tsx` - Stato iniziale modificato
+
+---
+
+## Riordino Abitudini con Drag & Drop 
+**Data**: 16 Gennaio 2026 - Ore 18:08  
+**Libreria**: @dnd-kit (v6+)
+
+### Descrizione
+Implementata la funzionalità di riordino personalizzato delle abitudini nel pannello "Gestisci Abitudini" tramite **drag & drop** intuitivo. Gli utenti possono ora trascinare e rilasciare le proprie abitudini per riordinarle secondo le loro preferenze, con persistenza automatica nel database.
+
+### Tecnologie Utilizzate
+
+#### @dnd-kit Library
+Scelto **@dnd-kit** come libreria drag & drop per i seguenti vantaggi:
+- ✅ **Touchfriendly**: Supporto nativo per touch su mobile/tablet
+- ✅ **Accessibility**: ARIA attributes e keyboard navigation integrati
+- ✅ **Performance**: Ottimizzato per animazioni smooth con Framer Motion
+- ✅ **TypeScript**: First-class TypeScript support
+- ✅ **Modern**: Hook-based API moderna e dichiarativa
+
+**Installazione**:
+```bash
+npm install @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities
+```
+
+### Modifiche Database
+
+#### Schema SQL
+Aggiunto campo `display_order` alla tabella `goals`:
+
+**File**: `schema.sql` (linea 69)
+```sql
+CREATE TABLE public.goals (
+    id uuid DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
+    user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    title text NOT NULL,
+    description text,
+    color text NOT NULL,
+    icon text,
+    frequency_days integer[],
+    start_date timestamp with time zone NOT NULL,
+    end_date timestamp with time zone,
+    display_order integer,  -- NUOVO CAMPO
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
+);
+```
+
+#### Migration Script
+**File**: `/Users/simo/Downloads/DEV/habit-tracker/migrations/20260116_add_display_order.sql`
+
+```sql
+-- Add display_order column
+ALTER TABLE public.goals ADD COLUMN IF NOT EXISTS display_order INTEGER;
+
+-- Initialize existing records
+UPDATE public.goals 
+SET display_order = sub.row_num 
+FROM (
+  SELECT id, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at) as row_num 
+  FROM public.goals
+) sub 
+WHERE goals.id = sub.id AND goals.display_order IS NULL;
+```
+
+**Effetti**:
+- Le abitudini esistenti mantengono l'ordine corrente (basato su `created_at`)
+- Nuove abitudini ricevono automaticamente `display_order` incrementale
+- Il campo è nullable per compatibilità retroattiva
+
+### Modifiche TypeScript
+
+#### types/goals.ts
+Aggiunto campo `display_order` all'interfaccia `Goal`:
+
+```typescript
+export interface Goal {
+    id: string;
+    user_id: string;
+    title: string;
+    color: string;
+    // ... altri campi
+    display_order?: number; // NUOVO
+    created_at: string;
+    updated_at: string;
+}
+```
+
+### Modifiche Hook useGoals
+
+**File**: `src/hooks/useGoals.ts`
+
+#### 1. Query con Ordinamento (linea 15-18)
+```typescript
+const { data: goals } = useQuery({
+    queryKey: ['goals'],
+    queryFn: async () => {
+        const { data, error } = await supabase
+            .from('goals')
+            .select('*')
+            .order('display_order', { ascending: true, nullsFirst: false })
+            .order('created_at', { ascending: true }); // fallback
+    }
+});
+```
+
+**Logica**:
+- Ordina primariamente per `display_order`
+- Fallback su `created_at` se `display_order` è NULL
+- `nullsFirst: false` spinge i NULL alla fine
+
+#### 2. Auto-assegnazione display_order (linea 78-90)
+Quando si crea una nuova abitudine:
+```typescript
+// Fetch max display_order  
+const { data: maxOrderData } = await supabase
+    .from('goals')
+    .select('display_order')
+    .eq('user_id', session.user.id)
+    .order('display_order', { ascending: false, nullsFirst: false })
+    .limit(1);
+
+const nextOrder = (maxOrderData && maxOrderData.length > 0 && (maxOrderData[0] as any).display_order)
+    ? (maxOrderData[0] as any).display_order + 1
+    : 1;
+
+// Insert con display_order
+.insert([{
+    // ... altri campi
+    display_order: nextOrder
+}])
+```
+
+#### 3. Update Order Mutation (linea 294-328)
+Nuova mutation per salvare il riordino:
+```typescript
+const updateOrderMutation = useMutation({
+    mutationFn: async (reorderedGoals: { id: string; display_order: number }[]) => {
+        // Bulk update usando Promise.all
+        const updates = reorderedGoals.map(({ id, display_order }) =>
+            supabase.from('goals')
+                .update({ display_order })
+                .eq('id', id)
+                .eq('user_id', session.user.id)
+        );
+        await Promise.all(updates);
+    },
+    onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['goals'] });
+        toast.success('Ordine salvato');
+    }
+});
+```
+
+**Return** (linea 297-315):
+```typescript
+return {
+    // ... existing returns
+    updateOrder: updateOrderMutation.mutate,
+    isUpdatingOrder: updateOrderMutation.isPending,
+};
+```
+
+### Componente HabitSettings
+
+**File**: `src/components/HabitSettings.tsx` - Refactoring completo
+
+#### Imports @dnd-kit (linee 29-44)
+```typescript
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    TouchSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent,
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+    useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+```
+
+#### Props Aggiornate (linea 48-56)
+```typescript
+interface HabitSettingsProps {
+    habits: Goal[];
+    onAddHabit: (goal: { title: string; color: string }) => void;
+    onRemoveHabit: (id: string) => void;
+    onUpdateHabit?: (data: { id: string; title: string; color: string }) => void;
+    onUpdateOrder?: (reorderedGoals: { id: string; display_order: number }[]) => void; // NUOVO
+    isDeleting?: boolean;
+    isUpdating?: boolean;
+    isPrivacyMode?: boolean;
+}
+```
+
+#### Nuovo Componente SortableHabitItem (linee 70-242)
+```typescript
+function SortableHabitItem({ habit, ... }: SortableHabitItemProps) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: habit.id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+        <div ref={setNodeRef} style={style}>
+            {/* Drag Handle */}
+            <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing...">
+                <GripVertical className="h-4 w-4 text-muted-foreground" />
+            </div>
+            {/* Rest of habit card */}
+        </div>
+    );
+}
+```
+
+**Features**:
+- **Grip Icon**: `GripVertical` da Lucide React, visible on hover
+- **Cursore dinamico**: `cursor-grab` → `cursor-grabbing`
+- **Opacità**: 50% durante drag per feedback visivo
+- **Smooth transform**: CSS.Transform con transition
+
+#### Sensors Setup (linee 289-295)
+```typescript
+const sensors = useSensors(
+    useSensor(PointerSensor),      // Mouse desktop
+    useSensor(TouchSensor),        // Touch mobile/tablet
+    useSensor(KeyboardSensor, {    // Keyboard accessibility
+        coordinateGetter: sortableKeyboardCoordinates,
+    })
+);
+```
+
+**Accessibilità**:
+- **Keyboard**: Space/Enter per pick, Arrows per muovere, Escape per cancel
+- **Screen readers**: ARIA announcements automatici
+
+#### Local State Management (linee 262-271)
+```typescript
+const [localHabits, setLocalHabits] = useState<Goal[]>(sortedHabits);
+
+useEffect(() => {
+    setLocalHabits(sortedHabits);
+}, [sortedHabits]);
+```
+
+**Perché local state?**
+- Immediate visual feedback durante drag
+- Evita flickering mentre awaits database update
+- Sincronizzazione automatica con props via useEffect
+
+#### handleDragEnd Function (linee 327-348)
+```typescript
+const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (!over || active.id === over.id) return;
+    
+    setLocalHabits((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        
+        const reordered = arrayMove(items, oldIndex, newIndex);
+        
+        // Persist to database
+        if (onUpdateOrder) {
+            const updates = reordered.map((habit, index) => ({
+                id: habit.id,
+                display_order: index + 1  // 1-indexed
+            }));
+            onUpdateOrder(updates);
+        }
+        
+        return reordered;
+    });
+};
+```
+
+**Logica**:
+1. Trova indici old/new dell'item dragged
+2. Riordina array localmente con `arrayMove` (@dnd-kit/sortable)
+3. Calcola nuovi `display_order` (1-indexed, sequenziale)
+4. Persiste nel database via `onUpdateOrder`
+5. Ritorna nuovo array per update immediato UI
+
+#### DndContext Wrapper (linee 399-430)
+```tsx
+<DndContext
+    sensors={sensors}
+    collisionDetection={closestCenter}
+    onDragEnd={handleDragEnd}
+>
+    <SortableContext
+        items={localHabits.map(h => h.id)}
+        strategy={verticalListSortingStrategy}
+    >
+        {localHabits.map((habit) => (
+            <SortableHabitItem key={habit.id} habit={habit} ... />
+        ))}
+    </SortableContext>
+</DndContext>
+```
+
+**Configurazione**:
+- **collisionDetection**: `closestCenter` per drag fluido
+- **strategy**: `verticalListSortingStrategy` (ordinamento verticale)
+- **items**: Array di habit IDs per tracking
+
+### Integrazione Index Page
+
+**File**: `src/pages/Index.tsx`
+
+Modifiche (linee 39-52, 185-193):
+```typescript
+const {
+    // ... existing
+    updateOrder,
+    isUpdatingOrder,
+} = useGoals();
+
+// ...
+
+<HabitSettings
+    habits={goals}
+    onAddHabit={createGoal}
+    onUpdateHabit={updateGoal}
+    onUpdateOrder={updateOrder}  // NUOVO
+    onRemoveHabit={deleteGoal}
+    isDeleting={isDeleting}
+    isUpdating={isUpdating}
+    isPrivacyMode={isPrivacyMode}
+/>
+```
+
+### Design UI/UX
+
+#### Visual Indicators
+- **Grip Icon**: `⋮⋮` (GripVertical) a sinistra di ogni abitudine
+- **Hover states**:
+  - Grip: `opacity-40` → `opacity-100`
+  - Card: Border highlight `border-white/10`
+- **Cursori**:
+  - Hover grip: `cursor-grab`
+  - Durante drag: `cursor-grabbing`
+- **Drag feedback**:
+  - Opacità 50% su item dragged
+  - Gli altri items si spostano smooth
+  - Transition automatica
+
+#### Mobile Optimization
+- **Touch gestures**: Supporto nativo touch start/move/end
+- **Grip sempre visibile** su mobile (no hover state)
+- **Touch-none class**: Previene scroll accidentale durante drag
+
+#### Accessibility
+- **Keyboard navigation**:
+  - Tab: Naviga tra abitudini
+  - Space/Enter: Pick/Drop
+  - Arrow keys: Muovi su/giù
+  - Escape: Cancel drag
+- **Screen reader**: Announcements automatici via @dnd-kit ARIA
+- **Focus indicators**: Visible su keyboard focus
+
+### Benefici Utente
+
+1. **🎯 Personalizzazione**: Ordina abitudini per priorità o preferenza personale
+2. **⚡ Intuitivo**: Drag & drop universalmente riconosciuto
+3. **📱 Multi-device**: Funziona su desktop, tablet, e mobile
+4. **♿ Accessibile**: Keyboard + screen reader support
+5. **💾 Persistente**: Ordine salvato automaticamente e sincronizzato
+6. **🎨 Smooth**: Animazioni fluide con visual feedback
+
+### Testing Manuale Richiesto
+
+Vedere `TO_SIMO_DO.md` per checklist completa di test che include:
+- Drag & drop desktop (mouse)
+- Touch mobile/tablet
+- Keyboard accessibility
+- Persistenza dopo reload
+- Interazione con add/delete abitudini
+
+### File Modificati/Creati
+
+**Creati**:
+- `/Users/simo/Downloads/DEV/habit-tracker/migrations/20260116_add_display_order.sql` - Migration SQL
+
+**Modificati**:
+- `/Users/simo/Downloads/DEV/habit-tracker/schema.sql` - Aggiunto campo display_order
+- `/Users/simo/Downloads/DEV/habit-tracker/src/types/goals.ts` - Interfaccia Goal aggiornata
+- `/Users/simo/Downloads/DEV/habit-tracker/src/hooks/useGoals.ts` - Query ordering + updateOrder mutation
+- `/Users/simo/Downloads/DEV/habit-tracker/src/components/HabitSettings.tsx` - Refactoring completo con @dnd-kit
+- `/Users/simo/Downloads/DEV/habit-tracker/src/pages/Index.tsx` - Connessione updateOrder prop
+
+**Dipendenze**:
+- `@dnd-kit/core`: ^6.0.0
+- `@dnd-kit/sortable`: ^8.0.0
+- `@dnd-kit/utilities`: ^3.2.0
+
+---
+
 ## File Creato
 
 📄 **`/Users/simo/Downloads/DEV/habit-tracker/RELEASE_NOTES.md`**
@@ -641,7 +1060,4 @@ Con questa modifica:
 
 ### Motivazione
 Questa modifica migliora l'esperienza utente iniziale permettendo all'utente di esplorare l'applicazione senza la funzionalità AI e decidere consapevolmente quando attivarla, rispettando anche le preferenze privacy-first dell'applicazione.
-
-### File Coinvolti
-- `/Users/simo/Downloads/DEV/habit-tracker/src/context/AIContext.tsx` - Stato iniziale modificato
 
