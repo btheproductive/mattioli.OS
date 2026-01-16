@@ -573,3 +573,47 @@ Identifica automaticamente pattern critici e genera alert contestuali.
 ### Conclusione
 
 L'analisi avanzata WORST trasforma dati grezzi in **insights actionable**, fornendo all'utente strumenti potenti per migliorare le proprie abitudini attraverso un'analisi scientifica e predittiva dei pattern di fallimento e recupero.
+
+---
+
+## Top 3 Abitudini Peggiori nel Box "Confronto Performance"
+**Data**: 16 Gennaio 2026  
+**Componente**: `WorstStreakAnalysis.tsx`
+
+### Descrizione
+Modificato il box "Confronto Performance" nella sezione "Analisi Worst Streaks" per mostrare le **3 abitudini peggiori** (con il peggior rapporto Best/Worst streak) invece delle 5 migliori. Questo permette all'utente di identificare rapidamente le abitudini che necessitano di maggior attenzione e miglioramento.
+
+### Modifiche Implementate
+
+#### 1. Inversione dell'Ordinamento (linea 87)
+- **Prima**: `.sort((a, b) => b.gap - a.gap)` - Ordinamento discendente (dal migliore al peggiore)
+- **Dopo**: `.sort((a, b) => a.gap - b.gap)` - Ordinamento ascendente (dal peggiore al migliore)
+
+#### 2. Riduzione Numero Abitudini (linea 88)
+- **Prima**: `.slice(0, 5)` - Mostrava le top 5 abitudini
+- **Dopo**: `.slice(0, 3)` - Mostra solo le top 3 abitudini peggiori
+
+#### 3. Tooltip Aggiornato (linee 336-340)
+- **Prima**: "Confronta la tua migliore serie (Best) con la peggiore (Worst) per capire il gap tra i tuoi record positivi e negativi."
+- **Dopo**: "Mostra le 3 abitudini con il peggior rapporto Best/Worst. Queste sono le abitudini che hanno più margine di miglioramento e richiedono maggior attenzione."
+
+### Logica di Calcolo
+Il **gap** viene calcolato come: `gap = (longestStreak / worstStreak) * 100`
+
+**Interpretazione del gap**:
+- Gap >= 300%: Status "excellent" (verde)
+- Gap >= 150%: Status "good" (giallo)
+- Gap < 150%: Status "attention" (arancione)
+
+Le abitudini con gap più basso sono quelle che hanno il peggior rapporto tra best e worst streak, quindi sono quelle che necessitano di maggior miglioramento.
+
+### Esperienza Utente
+Ora l'utente può visualizzare immediatamente nel box "Confronto Performance":
+1. Le 3 abitudini con più margine di miglioramento
+2. Il rapporto visivo tra Best Streak e Worst Streak per ciascuna
+3. Lo status colorato che indica il livello di attenzione richiesta
+4. Il gap percentuale che quantifica la differenza tra best e worst
+
+### File Modificato
+- `/src/components/stats/WorstStreakAnalysis.tsx` - Linee 65, 87-88, 336-340
+

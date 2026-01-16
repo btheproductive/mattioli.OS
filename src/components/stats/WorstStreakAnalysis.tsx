@@ -62,7 +62,7 @@ export function WorstStreakAnalysis({ habitStats }: WorstStreakAnalysisProps) {
 
         const fastestRecoverers = recoveryPatterns.slice(0, 3);
 
-        // Confronto Best vs Worst
+        // Confronto Best vs Worst - Top 3 peggiori
         const comparisons = habitStats
             .filter(h => h.worstStreak > 0)
             .map(habit => {
@@ -85,8 +85,8 @@ export function WorstStreakAnalysis({ habitStats }: WorstStreakAnalysisProps) {
                     status
                 };
             })
-            .sort((a, b) => b.gap - a.gap)
-            .slice(0, 5);
+            .sort((a, b) => a.gap - b.gap)
+            .slice(0, 3);
 
         // Suggerimenti Pratici
         const suggestions: Array<{ icon: string; title: string; description: string; action: string }> = [];
@@ -335,8 +335,8 @@ export function WorstStreakAnalysis({ habitStats }: WorstStreakAnalysisProps) {
                             </TooltipTrigger>
                             <TooltipContent className="max-w-xs">
                                 <p className="text-sm">
-                                    Confronta la tua migliore serie (Best) con la peggiore (Worst)
-                                    per capire il gap tra i tuoi record positivi e negativi.
+                                    Mostra le 3 abitudini con il peggior rapporto Best/Worst.
+                                    Queste sono le abitudini che hanno più margine di miglioramento e richiedono maggior attenzione.
                                 </p>
                             </TooltipContent>
                         </Tooltip>
