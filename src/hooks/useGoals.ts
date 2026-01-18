@@ -146,6 +146,11 @@ export function useGoals() {
             .from('goals') as any)
             .update({ end_date: getLocalDateKey(yesterday) })
             .eq('id', goalId);
+
+        if (error) {
+            console.error('Soft delete failed:', error);
+            throw error;
+        }
     };
 
     // DELETE GOAL (Smart Delete)

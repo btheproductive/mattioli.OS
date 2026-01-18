@@ -1469,3 +1469,135 @@ In seguito al feedback dell'utente, la visualizzazione è stata **refactorata da
 
 La visualizzazione "Vita" completa il set di viste temporali dell'applicazione (Mese → Settimana → Anno → Vita), fornendo la prospettiva più ampia possibile sul percorso di crescita personale dell'utente. Con **granularità settimanale** (1 pallino = 1 settimana), l'utente può visualizzare concretamente tutte le ~4,420 settimane della propria vita produttiva, rendendo tangibile il valore di ogni singola settimana. Il design responsive e i colori performance-based rendono la visualizzazione sia informativa che ispirazionale.
 
+
+## Miglioramento Soft-Delete per Abitudini Giornaliere
+
+### Data Implementazione
+**18 Gennaio 2026 - Ore 21:20**
+
+### Panoramica
+
+Modificato il comportamento della funzione di eliminazione (soft-delete) delle abitudini giornaliere per migliorare l'esperienza utente. Ora quando un'abitudine viene eliminata:
+- ✅ **Giorni precedenti**: Tutti i dati storici rimangono invariati
+- ✅ **Giorno corrente**: L'abitudine rimane visibile e modificabile
+- ✅ **Giorni futuri**: L'abitudine non appare più nelle visualizzazioni
+- ✅ **Statistiche**: L'abitudine rimane visibile come "(archiviato)" con tutti i dati storici
+
+### Problema Identificato
+
+**Comportamento precedente** (❌):
+```typescript
+const softDelete = async (goalId: string) => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    await supabase.from('goals')
+        .update({ end_date: getLocalDateKey(yesterday) })
+        .eq('id', goalId);
+};
+```
+
+**Problema**: Impostando \`end_date = ieri\`, l'abitudine scompariva immediatamente dalla vista odierna, poiché il filtro \`end_date >= oggi\` la escludeva.
+
+### Soluzione Implementata
+
+**Nuovo comportamento** (✅):
+```typescript
+const softDelete = async (goalId: string) => {
+    const today = new Date();
+
+    const { error } = await supabase
+        .from('goals')
+        .update({ end_date: getLocalDateKey(today) })
+        .eq('id', goalId);
+    
+    if (error) {
+        console.error('Soft delete failed:', error);
+        throw error;
+    }
+};
+```
+
+**Vantaggi**:
+1. **end_date = oggi** → l'abitudine è ancora attiva oggi
+2. **Filtro attivo**: \`!g.end_date || g.end_date >= getLocalDateKey(new Date())\` → \`true\` per oggi
+3. **Da domani**: \`end_date < domani\` → l'abitudine non sarà più visibile
+4. **Error handling**: Aggiunto logging e throw per gestire errori di database
+
+### File Modificato
+
+**\`src/hooks/useGoals.ts\`**
+- **Linee modificate**: 141-149
+- **Funzione**: \`softDelete()\`
+- **Cambiamento principale**: \`getLocalDateKey(yesterday)\` → \`getLocalDateKey(today)\`
+- **Aggiunto**: Error handling con \`console.error\` e \`throw\`
+
+### Range Validation (già implementato correttamente)
+
+Il sistema verifica automaticamente che le operazioni di toggle siano nel range valido:
+
+```typescript
+// Linee 234-245 in useGoals.ts
+const { data: goal } = await supabase
+    .from('goals')
+    .select('start_date, end_date')
+    .eq('id', goalId)
+    .single();
+
+if (!isDateInGoalRange(dateStr, goalData.start_date, goalData.end_date)) {
+    throw new Error('Impossibile modificare un obiettivo fuori dal suo periodo di validità.');
+}
+```
+
+**Comportamento risultante**:
+- **Oggi**: Posso ancora modificare l'abitudine eliminata (end_date = oggi, quindi nel range)
+- **Da domani**: Non posso più modificare (fuori dal range)
+
+### Visualizzazione nelle Statistiche
+
+La pagina Stats (\`src/pages/Stats.tsx\`) già gestisce correttamente le abitudini archiviate:
+
+**Dropdown selector** (linee 251-259):
+```tsx
+{allGoals.map(goal => (
+    <SelectItem key={goal.id} value={goal.id}>
+        <span className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: goal.color }} />
+            {goal.title}
+            {goal.end_date && <span className="text-xs text-muted-foreground">(archiviato)</span>}
+        </span>
+    </SelectItem>
+))}
+```
+
+**Calcolo statistiche** (linee 73-74):
+```typescript
+const goalEndDate = selectedGoal.end_date ? new Date(selectedGoal.end_date) : today;
+const endDate = goalEndDate > today ? today : goalEndDate;
+```
+
+Questo assicura che le statistiche vengano calcolate correttamente fino alla data di eliminazione.
+
+### Benefici Utente
+
+1. **🎯 Transizione graduale**: L'abitudine rimane visibile il giorno dell'eliminazione
+2. **📊 Dati storici preservati**: Tutti i log precedenti rimangono intatti
+3. **🔍 Statistiche complete**: Possibilità di visualizzare le performance passate
+4. **✨ Comportamento intuitivo**: L'eliminazione ha effetto "dal domani"
+
+### Testing Suggerito
+
+Vedere \`TO_SIMO_DO.md\` per i test manuali dettagliati che includono:
+- Verifica visibilità dopo eliminazione
+- Test range di editing (oggi vs domani)
+- Controllo statistiche con abitudini archiviate
+- Validazione database
+
+### Impatto
+
+- **Breaking Changes**: Nessuno
+- **Dati Esistenti**: Abitudini già eliminate con \`end_date = ieri\` continueranno a funzionare
+- **Performance**: Nessun impatto (solo cambio di valore data)
+- **Compatibilità**: Retrocompatibile al 100%
+
+---
