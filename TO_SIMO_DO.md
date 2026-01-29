@@ -11,13 +11,13 @@ npm run deploy
 
 ### 2. PWA Update (Critical Step)
 **IMPORTANT for iOS Users**:
-We have restored variables to use your specific requested icon (`pwa-icon-restored.png`).
+We have applied YOUR custom uploaded icon (`pwa-icon-v5.png`).
 **YOU MUST RUN `npm run deploy` FIRST!**
 
 1.  **Delete** the existing "Mattioli.OS" app from your Home Screen.
 2.  Open Safari and visit `https://simo-hue.github.io/mattioli.OS/`.
 3.  Tap "Share" -> "Add to Home Screen".
-4.  **Verify**: You should see the icon you requested.
+4.  **Verify**: You should see your custom icon.
 5.  Launch the app.
 
 ### 3. Verify in Google Search Console
