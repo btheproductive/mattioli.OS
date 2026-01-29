@@ -2,6 +2,16 @@
 
 ## 📅 Log Modifiche (Ultimi aggiornamenti)
 
+### [2026-01-29] Fix Logica Macro Goals (Obiettivi Futuri)
+- **Problema**: L'app segnava come "falliti" gli obiettivi futuri (es. settimana prossima) durante il controllo automatico di scadenza.
+- **Causa**: La funzione SQL `check_and_fail_expired_goals` utilizzava una logica di confronto date imprecisa che non gestiva correttamente la gerarchia Anno -> Mese -> Settimana, causando falsi positivi quando il numero della settimana differiva ma l'anno/mese erano futuri. Inoltre, il calcolo della "settimana corrente" nel database poteva differire dalla logica frontend (`date-fns`).
+- **Soluzione**:
+  - Creata migrazione `migrations/20260129_fix_macro_goals_logic.sql` per ridefinire la funzione SQL.
+  - La nuova funzione ora accetta parametri espliciti (`current_year`, `current_month`, `current_week`, `current_quarter`) calcolati dal frontend.
+  - Logica SQL aggiornata per verificare rigorosamente se la data target è *strettamente* nel passato.
+  - Aggiornato `MacroGoalsStats.tsx` per passare i valori di data calcolati con `date-fns` (coerenza frontend-backend).
+- **Beneficio**: Gli obiettivi pianificati per il futuro rimangono correttamente nello stato "active" e non vengono più falliti prematuramente.
+
 ### [2026-01-29] PWA Implementation (iOS Fix)
 - **Problema**: Su iOS, l'app usciva dalla modalità standalone (full-screen) navigando fuori dalla home page.
 - **Soluzione**: Implementazione completa PWA Configuration.

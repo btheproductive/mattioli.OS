@@ -11,6 +11,7 @@ import {
 } from 'recharts';
 import { Loader2, Trophy, Target, TrendingUp, CheckCircle2, Zap, Brain, Rocket, Calendar, Activity } from 'lucide-react';
 import { useGoalCategories, DEFAULT_CATEGORY_LABELS } from '@/hooks/useGoalCategories';
+import { getQuarter, getWeekOfMonth } from 'date-fns';
 
 interface MacroGoalsStatsProps {
     year: number | string;
@@ -74,7 +75,20 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
 
     useEffect(() => {
         const checkExpired = async () => {
-            const { error } = await supabase.rpc('check_and_fail_expired_goals');
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;
+            const currentWeek = getWeekOfMonth(now, { weekStartsOn: 1 });
+            const currentQuarter = getQuarter(now);
+
+            // @ts-expect-error: RPC function signature updated in migration but types not yet regenerated
+            const { error } = await supabase.rpc('check_and_fail_expired_goals', {
+                current_year: currentYear,
+                current_month: currentMonth,
+                current_week: currentWeek,
+                current_quarter: currentQuarter
+            });
+
             if (error) console.error('Error checking expired goals:', error);
         };
         checkExpired();
