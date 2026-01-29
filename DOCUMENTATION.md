@@ -2,6 +2,13 @@
 
 ## 📅 Log Modifiche (Ultimi aggiornamenti)
 
+### [2026-01-29] PWA Implementation (iOS Fix)
+- **Problema**: Su iOS, l'app usciva dalla modalità standalone (full-screen) navigando fuori dalla home page.
+- **Soluzione**: Implementazione completa PWA Configuration.
+- **File Creato**: `public/manifest.json` configurato con `display: standalone` e `start_url` puntato alla dashboard.
+- **File Modificato**: `index.html` con aggiunta meta tags specifici per iOS (`apple-mobile-web-app-capable`).
+- **Scope**: Configurato `/mattioli.OS/` per coprire sia l'app che il sito.
+
 ### [2026-01-29] App Prefix Refactoring (/sw)
 - **Modifica Architetturale**: Tutte le rotte dell'applicazione autenticata sono state spostate sotto il prefisso `/sw/`.
 - **Obiettivo**: Separare nettamente il sito pubblico (Landing, Features, FAQ) dalla Web App vera e propria.

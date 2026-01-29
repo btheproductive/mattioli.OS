@@ -9,27 +9,21 @@ After the automatic build process completes, you need to deploy the updated vers
 npm run deploy
 ```
 
-This will:
-- Run the build script (which now includes static route generation)
-- Copy `index.html` to `404.html` for SPA fallback
-- Deploy the `dist` folder to GitHub Pages
+### 2. PWA Update (Critical Step)
+**IMPORTANT for iOS Users**:
+Because we changed the PWA configuration (`manifest.json`), you **MUST** reinstall the app for changes to take effect:
 
-### 2. Verify in Google Search Console
-After deployment:
-1. Go to Google Search Console
-2. Navigate to URL Inspection tool
-3. Test the URL: `https://simo-hue.github.io/mattioli.OS/features`
-4. Click "Request Indexing"
-5. Google should now receive a **200 OK** instead of **404 Not Found**
+1.  **Delete** the existing "Mattioli.OS" app from your Home Screen.
+2.  Open Safari and visit `https://simo-hue.github.io/mattioli.OS/`.
+3.  Tap "Share" -> "Add to Home Screen".
+4.  Launch the new icon.
+5.  **Verify**: The app should now launch directly into the Login/Dashboard screen and stay in full-screen (standalone) mode when navigating.
 
-### 3. Test All Routes
-Verify that all public routes are working correctly by visiting:
-- https://simo-hue.github.io/mattioli.OS/features
-- https://simo-hue.github.io/mattioli.OS/faq
-- https://simo-hue.github.io/mattioli.OS/tech
-- https://simo-hue.github.io/mattioli.OS/philosophy
-- https://simo-hue.github.io/mattioli.OS/get-started
-- https://simo-hue.github.io/mattioli.OS/creator
+### 3. Verify in Google Search Console
+Test the URL: `https://simo-hue.github.io/mattioli.OS/features`
+
+### 4. Test All Routes
+Verify that all public and app routes are working correctly.
 
 Verify App Routes (Authentication Required):
 - https://simo-hue.github.io/mattioli.OS/sw/dashboard
@@ -37,14 +31,8 @@ Verify App Routes (Authentication Required):
 - https://simo-hue.github.io/mattioli.OS/sw/macro-goals
 - https://simo-hue.github.io/mattioli.OS/sw/ai-coach
 
-All routes should load correctly with a 200 status code.
-
-### 4. Monitor Indexing Status
-Over the next few days, monitor Google Search Console to ensure all pages are being indexed correctly.
-
 ---
 
 ## Notes
 - The build script now automatically generates static HTML files for all public routes
 - No additional manual steps are needed during the build process
-- Future deployments will automatically include the static route generation
