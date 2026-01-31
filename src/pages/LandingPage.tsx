@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import LandingMobileNav from "@/components/LandingMobileNav";
 import PublicHeader from "@/components/PublicHeader";
+import { LandingDemo } from "@/components/demo/LandingDemo";
 
 const LandingPage = () => {
     const fadeInUp = {
@@ -73,6 +74,32 @@ const LandingPage = () => {
                     >
                         A complete <span className="text-white font-medium">Open Source</span> and <span className="text-white font-medium">completely free</span> suite to track habits, define macro goals and monitor your personal growth with surgical precision.
                     </motion.p>
+                </div>
+            </section>
+
+            {/* Demo Section - Desktop Only */}
+            <section className="hidden lg:block py-16 px-6">
+                <div className="container mx-auto">
+                    <div className="text-center mb-12">
+                        <motion.h2
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="text-3xl font-bold mb-4"
+                        >
+                            See It In Action
+                        </motion.h2>
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.1 }}
+                            className="text-zinc-400 max-w-2xl mx-auto"
+                        >
+                            A complete dashboard to track your daily habits with visual analytics and mood tracking.
+                        </motion.p>
+                    </div>
+                    <LandingDemo />
                 </div>
             </section>
 

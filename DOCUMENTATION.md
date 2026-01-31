@@ -2,6 +2,24 @@
 
 ## 📅 Log Modifiche (Ultimi aggiornamenti)
 
+### [2026-01-31] Landing Page Demo Section (Desktop Only)
+- **New Feature**: Added a fully interactive demo preview of the app to the landing page.
+- **Location**: Placed between the Hero section and the 6 feature boxes.
+- **Visibility**: Desktop only (`hidden lg:block`), hidden on mobile/tablet.
+- **Interactive Features**:
+  - **Tab Navigation**: Working tabs to switch between Month, Week, Year, and Life views
+  - **Clickable Days**: Click any past day to open a modal showing habit completion details
+  - **Animated Transitions**: Smooth animations when switching views and opening modals
+- **Demo Views**:
+  - **Month View**: Full January 2026 calendar with colored habit dots
+  - **Week View**: Weekly grid with habit completion bars
+  - **Year View**: Annual heatmap overview
+  - **Life View**: Memento Mori weeks visualization
+- **Static Data**: 5 demo habits with realistic completion patterns (no database)
+- **Files Created**: `src/components/demo/LandingDemo.tsx`
+- **Files Modified**: `src/pages/LandingPage.tsx`
+- **Testing**: Build verified successfully.
+
 ### [2026-01-31] Website Translation: Italian → English
 - **Scope**: Translated all public website pages from Italian to English (web app content excluded).
 - **Files Modified**:
