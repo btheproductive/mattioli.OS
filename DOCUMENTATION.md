@@ -3,28 +3,31 @@
 ## 📅 Log Modifiche (Ultimi aggiornamenti)
 
 ### [2026-01-31] Landing Page Demo Section (Desktop Only)
+- **English Translation**: Fully translated the interactive demo into English (UI labels, mock data, navigation).
+- **Refined Trend Chart**: Dynamic data updates based on timeframe (Week, Month, Year, All).
+- **Minimalist Mood Matrix**: Redesigned Mood tab to show two clean boxes (Mood & Energy) with specific habit correlation cards, removing the complex chart for better clarity.
 - **New Feature**: Added a fully interactive demo preview of the app to the landing page.
 - **Location**: Placed between the Hero section and the 6 feature boxes.
 - **Visibility**: Desktop only (`hidden lg:block`), hidden on mobile/tablet.
 - **Navigation Bar**: Top navigation with 3 sections:
   - **Dashboard**: Habit tracking with Month/Week views
   - **Macro Goals**: Full-screen CTA encouraging users to try the app on GitHub
-  - **Statistiche**: Complete stats view with 5 tabs matching the web app
+  - **Statistics**: Complete stats view with 5 tabs matching the web app
 - **Interactive Features**:
   - **Tab Navigation**: Working tabs to switch between Month and Week views
   - **Page Navigation**: Click navbar to switch between Dashboard, Macro Goals, and Stats
   - **Clickable Days**: Click any past day to open modal with habit completion details
   - **Animated Transitions**: Smooth animations when switching views
-- **Statistics View (5 Tabs)**:
-  - **Info**: 4 KPI cards (Completamento, Miglior Serie, Top Performer, Giorno Peggiore) + Abitudini Chiave section with correlations
-  - **Trend**: Area chart with period selector (Sett/Mese/Anno/Tutto)
-  - **Alert**: Aree di Miglioramento + Analisi Worst Streaks
-  - **Abitudini**: Full habit list with BEST, WORST, SERIE, RATE stats
-  - **Mood**: Mood & Energy vs Productivity chart + mood/energy correlation sections
+- **Statistics View (5 Tabs English)**:
+  - **Info**: 4 KPI cards (Completion, Best Streak, Top Performer, Worst Day) + Keystone Habits section with correlations
+  - **Trend**: Area chart with period selector (Week/Month/Year/All)
+  - **Alert**: Areas of Improvement + Worst Streaks Analysis
+  - **Habits**: Full habit list with BEST, WORST, STREAK, RATE stats
+  - **Mood**: Dedicated boxes for Mood and Energy impact analysis
 - **Static Data**: 5 demo habits with realistic patterns (no database)
 - **Files Created**: `src/components/demo/LandingDemo.tsx`
 - **Files Modified**: `src/pages/LandingPage.tsx`
-- **Testing**: Build verified successfully.
+- **Testing**: Build verified successfully (`npm run build`).
 
 ### [2026-01-31] Website Translation: Italian → English
 - **Scope**: Translated all public website pages from Italian to English (web app content excluded).

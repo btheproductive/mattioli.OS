@@ -13,10 +13,10 @@ A new demo section has been added to the landing page showing a preview of the a
 
 ---
 
-## [2026-01-31] Website Translation Complete
+## [2026-01-31] Website Translation & Demo Refinement Complete
 
-All public website content has been translated from Italian to English. 
+All public website content and the interactive demo have been translated from Italian to English. The demo section has also been refined with dynamic trend data and a minimalist mood/energy view.
 
 ### Actions Required:
 1. **Deploy the changes** - Run `npm run build` and deploy to GitHub Pages
-2. **Verify translations** - Review the translated pages to ensure the translations accurately reflect the original meaning
+2. **Verify translations** - Review the translated pages and the Interactive Demo to ensure everything looks correct in English.

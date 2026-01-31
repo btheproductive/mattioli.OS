@@ -72,31 +72,31 @@ const generateDemoStats = () => {
         totalActiveDays: 18,
         globalSuccessRate: 78,
         bestStreak: 14,
-        worstDay: 'Lunedì',
+        worstDay: 'Monday',
         habitStats,
         weekdayStats: [
-            { day: 'Lun', rate: 65 },
-            { day: 'Mar', rate: 82 },
-            { day: 'Mer', rate: 75 },
-            { day: 'Gio', rate: 88 },
-            { day: 'Ven', rate: 70 },
-            { day: 'Sab', rate: 55 },
-            { day: 'Dom', rate: 48 },
+            { day: 'Mon', rate: 65 },
+            { day: 'Tue', rate: 82 },
+            { day: 'Wed', rate: 75 },
+            { day: 'Thu', rate: 88 },
+            { day: 'Fri', rate: 70 },
+            { day: 'Sat', rate: 55 },
+            { day: 'Sun', rate: 48 },
         ],
         trendData: Array.from({ length: 18 }, (_, i) => ({
             date: `${i + 1}/01`,
             value: 60 + Math.floor(Math.sin(i) * 25 + Math.random() * 10)
         })),
         criticalHabits: [
-            { title: 'Journal', issue: 'Streak interrotto 3 volte questa settimana', color: '#EC4899' },
+            { title: 'Journal', issue: 'Streak broken 3 times this week', color: '#EC4899' },
         ]
     };
 };
 
 const DEMO_RECORDS = generateDemoData();
 const DEMO_STATS = generateDemoStats();
-const DAYS = ['LUN', 'MAR', 'MER', 'GIO', 'VEN', 'SAB', 'DOM'];
-const DAYS_FULL = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
+const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+const DAYS_FULL = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 type PageType = 'dashboard' | 'goals' | 'stats';
 type ViewType = 'month' | 'week';
@@ -116,7 +116,7 @@ function DemoDayModal({
     const dateKey = `2026-01-${day.toString().padStart(2, '0')}`;
     const dayRecord = DEMO_RECORDS[dateKey] || {};
 
-    const dayNames = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const date = new Date(2026, 0, day);
     const dayName = dayNames[date.getDay()];
 
@@ -139,8 +139,8 @@ function DemoDayModal({
                     >
                         <div className="flex items-center justify-between mb-4">
                             <div>
-                                <h3 className="text-sm font-bold text-white">{dayName} {day} Gennaio</h3>
-                                <span className="text-[10px] text-zinc-500">Solo visualizzazione</span>
+                                <h3 className="text-sm font-bold text-white">{dayName} {day} January</h3>
+                                <span className="text-[10px] text-zinc-500">View only</span>
                             </div>
                             <button onClick={onClose} className="p-1 hover:bg-white/10 rounded-lg transition-colors">
                                 <XCircle className="w-4 h-4 text-zinc-500" />
@@ -260,7 +260,7 @@ function MonthView({ onDayClick }: { onDayClick: (day: number) => void }) {
                     <ChevronLeft className="w-4 h-4" />
                 </button>
                 <h2 className="text-lg font-bold">
-                    Gennaio <span className="text-zinc-500 font-light">2026</span>
+                    January <span className="text-zinc-500 font-light">2026</span>
                 </h2>
                 <button className="p-1.5 rounded-lg hover:bg-white/5 text-zinc-500">
                     <ChevronRight className="w-4 h-4" />
@@ -292,7 +292,7 @@ function WeekView({ onDayClick }: { onDayClick: (day: number) => void }) {
                 <button className="p-1.5 rounded-lg hover:bg-white/5 text-zinc-500">
                     <ChevronLeft className="w-4 h-4" />
                 </button>
-                <h2 className="text-sm font-bold">12 - 18 Gennaio</h2>
+                <h2 className="text-sm font-bold">January 12 - 18</h2>
                 <button className="p-1.5 rounded-lg hover:bg-white/5 text-zinc-500">
                     <ChevronRight className="w-4 h-4" />
                 </button>
@@ -367,13 +367,13 @@ function MacroGoalsView() {
 
                 {/* Title */}
                 <h2 className="text-xl font-bold text-white mb-3">
-                    <span className="text-purple-400">Aspetta...</span> hai cliccato sui Macro Goals?
+                    <span className="text-purple-400">Wait...</span> did you click on Macro Goals?
                 </h2>
 
                 {/* Description */}
                 <p className="text-sm text-zinc-400 mb-6 leading-relaxed">
-                    Sembra che tu abbia bisogno di organizzare la tua vita.<br />
-                    <span className="text-zinc-300">Ottima notizia: sei nel posto giusto!</span>
+                    It seems you need to organize your life.<br />
+                    <span className="text-zinc-300">Great news: you're in the right place!</span>
                 </p>
 
                 {/* CTA Button */}
@@ -384,7 +384,7 @@ function MacroGoalsView() {
                     className="inline-flex items-center gap-2 px-8 py-3 text-sm font-bold text-white bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 rounded-xl transition-all hover:scale-105 shadow-xl shadow-purple-500/30"
                 >
                     <span>🚀</span>
-                    Inizia su GitHub — È gratis!
+                    Get started on GitHub — It's free!
                 </a>
 
                 {/* Subtle footer */}
@@ -407,7 +407,7 @@ function StatsView() {
         { id: 'info' as const, label: 'Info' },
         { id: 'trend' as const, label: 'Trend' },
         { id: 'alert' as const, label: 'Alert' },
-        { id: 'abitudini' as const, label: 'Abitudini' },
+        { id: 'abitudini' as const, label: 'Habits' },
         { id: 'mood' as const, label: 'Mood' },
     ];
 
@@ -416,7 +416,7 @@ function StatsView() {
             {/* Goal Selector */}
             <div className="flex items-center gap-2 px-3 py-2 bg-zinc-800/50 rounded-lg border border-white/5 w-fit">
                 <Target className="w-3 h-3 text-zinc-400" />
-                <span className="text-[10px] text-zinc-300">Tutti i Goals</span>
+                <span className="text-[10px] text-zinc-300">All Goals</span>
                 <ChevronRight className="w-3 h-3 text-zinc-500 rotate-90" />
             </div>
 
@@ -465,18 +465,18 @@ function InfoTab({ stats }: { stats: typeof DEMO_STATS }) {
                 <div className="p-2 rounded-xl bg-zinc-800/30 border border-white/5">
                     <div className="flex items-center gap-1 mb-1">
                         <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                        <span className="text-[7px] text-zinc-500">Completamento</span>
+                        <span className="text-[7px] text-zinc-500">Completion</span>
                     </div>
                     <p className="text-lg font-bold text-white">{stats.globalSuccessRate}%</p>
-                    <p className="text-[7px] text-zinc-600">globale</p>
+                    <p className="text-[7px] text-zinc-600">global</p>
                 </div>
                 <div className="p-2 rounded-xl bg-zinc-800/30 border border-white/5">
                     <div className="flex items-center gap-1 mb-1">
                         <Flame className="w-2 h-2 text-orange-500" />
-                        <span className="text-[7px] text-zinc-500">Miglior Serie</span>
+                        <span className="text-[7px] text-zinc-500">Best Streak</span>
                     </div>
                     <p className="text-lg font-bold text-white">{stats.bestStreak}</p>
-                    <p className="text-[7px] text-zinc-600">giorni</p>
+                    <p className="text-[7px] text-zinc-600">days</p>
                 </div>
                 <div className="p-2 rounded-xl bg-zinc-800/30 border border-white/5">
                     <div className="flex items-center gap-1 mb-1">
@@ -484,15 +484,15 @@ function InfoTab({ stats }: { stats: typeof DEMO_STATS }) {
                         <span className="text-[7px] text-zinc-500">Top Performer</span>
                     </div>
                     <p className="text-[10px] font-bold text-white leading-tight">Meditation</p>
-                    <p className="text-[7px] text-zinc-600">97% completamento</p>
+                    <p className="text-[7px] text-zinc-600">97% completion</p>
                 </div>
                 <div className="p-2 rounded-xl bg-zinc-800/30 border border-white/5">
                     <div className="flex items-center gap-1 mb-1">
                         <AlertTriangle className="w-2 h-2 text-yellow-500" />
-                        <span className="text-[7px] text-zinc-500">Giorno Peggiore</span>
+                        <span className="text-[7px] text-zinc-500">Worst Day</span>
                     </div>
                     <p className="text-sm font-bold text-white">{stats.worstDay}</p>
-                    <p className="text-[7px] text-zinc-600">Focus richiesto</p>
+                    <p className="text-[7px] text-zinc-600">Focus Required</p>
                 </div>
             </div>
 
@@ -503,8 +503,8 @@ function InfoTab({ stats }: { stats: typeof DEMO_STATS }) {
                         <Trophy className="w-3 h-3 text-yellow-500" />
                     </div>
                     <div>
-                        <h3 className="text-[10px] font-bold text-white">Abitudini Chiave</h3>
-                        <p className="text-[8px] text-zinc-500">Abitudini che influenzano positivamente molte altre</p>
+                        <h3 className="text-[10px] font-bold text-white">Keystone Habits</h3>
+                        <p className="text-[8px] text-zinc-500">Habits that positively influence many others</p>
                     </div>
                 </div>
 
@@ -518,8 +518,8 @@ function InfoTab({ stats }: { stats: typeof DEMO_STATS }) {
                                 </div>
                                 <Trophy className="w-2.5 h-2.5 text-blue-400" />
                             </div>
-                            <span className="text-[7px] px-1 py-0.5 rounded bg-green-500/20 text-green-400">Impatto Basso</span>
-                            <p className="text-[7px] text-zinc-500 mt-1">2 connessioni</p>
+                            <span className="text-[7px] px-1 py-0.5 rounded bg-green-500/20 text-green-400">Low Impact</span>
+                            <p className="text-[7px] text-zinc-500 mt-1">2 connections</p>
                             <div className="mt-2 space-y-1">
                                 {stats.habitStats.slice(i + 1, i + 3).map(h => (
                                     <div key={h.id} className="flex justify-between text-[7px]">
@@ -529,7 +529,7 @@ function InfoTab({ stats }: { stats: typeof DEMO_STATS }) {
                                 ))}
                             </div>
                             <div className="flex justify-between text-[7px] mt-2 pt-1 border-t border-white/5">
-                                <span className="text-zinc-500">↗ Media</span>
+                                <span className="text-zinc-500">↗ Average</span>
                                 <span className="font-bold text-green-400">+0.74</span>
                             </div>
                         </div>
@@ -542,23 +542,23 @@ function InfoTab({ stats }: { stats: typeof DEMO_STATS }) {
 
 // Trend Tab - Area Chart with dynamic data per timeframe
 function TrendTab() {
-    const [period, setPeriod] = useState<'sett' | 'mese' | 'anno' | 'tutto'>('sett');
+    const [period, setPeriod] = useState<'week' | 'month' | 'year' | 'all'>('week');
 
     // Different data for each period
     const periodData = {
-        sett: {
-            labels: ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'],
+        week: {
+            labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
             points: [80, 75, 70, 68, 72, 85, 20]
         },
-        mese: {
-            labels: ['Sett 1', 'Sett 2', 'Sett 3', 'Sett 4'],
+        month: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
             points: [72, 78, 65, 82]
         },
-        anno: {
-            labels: ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'],
+        year: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             points: [45, 52, 60, 68, 75, 72, 78, 82, 85, 80, 76, 88]
         },
-        tutto: {
+        all: {
             labels: ['2024', '2025', '2026'],
             points: [55, 72, 78]
         }
@@ -594,7 +594,7 @@ function TrendTab() {
                 <div className="flex items-center justify-between mb-3">
                     <h3 className="text-[10px] font-bold text-white">Trend</h3>
                     <div className="flex bg-zinc-700/50 rounded-md p-0.5">
-                        {(['sett', 'mese', 'anno', 'tutto'] as const).map(p => (
+                        {(['week', 'month', 'year', 'all'] as const).map(p => (
                             <button
                                 key={p}
                                 onClick={() => setPeriod(p)}
@@ -645,9 +645,9 @@ function TrendTab() {
 // Alert Tab - Areas of Improvement + Worst Streaks
 function AlertTab({ stats }: { stats: typeof DEMO_STATS }) {
     const criticalHabits = [
-        { title: 'Reading', color: '#F59E0B', rate: 27, worstDay: 'martedì', dayRate: 0 },
-        { title: 'Coding', color: '#3B82F6', rate: 36, worstDay: 'martedì', dayRate: 0 },
-        { title: 'Journal', color: '#EC4899', rate: 37, worstDay: 'giovedì', dayRate: 17 },
+        { title: 'Reading', color: '#F59E0B', rate: 27, worstDay: 'Tuesday', dayRate: 0 },
+        { title: 'Coding', color: '#3B82F6', rate: 36, worstDay: 'Tuesday', dayRate: 0 },
+        { title: 'Journal', color: '#EC4899', rate: 37, worstDay: 'Thursday', dayRate: 17 },
     ];
 
     return (
@@ -657,8 +657,8 @@ function AlertTab({ stats }: { stats: typeof DEMO_STATS }) {
                 <div className="flex items-center gap-2 mb-3">
                     <Target className="w-3 h-3 text-zinc-400" />
                     <div>
-                        <h3 className="text-[10px] font-bold text-white">Aree di Miglioramento</h3>
-                        <p className="text-[7px] text-zinc-500">Abitudini che richiedono più attenzione e i loro giorni critici</p>
+                        <h3 className="text-[10px] font-bold text-white">Areas of Improvement</h3>
+                        <p className="text-[7px] text-zinc-500">Habits requiring more attention and their critical days</p>
                     </div>
                 </div>
 
@@ -675,10 +675,10 @@ function AlertTab({ stats }: { stats: typeof DEMO_STATS }) {
                             <div className="mt-2">
                                 <div className="flex items-center gap-1 text-[7px] text-zinc-500">
                                     <AlertTriangle className="w-2 h-2" />
-                                    <span>GIORNO NERO</span>
+                                    <span>CRITICAL DAY</span>
                                 </div>
                                 <p className="text-[10px] font-bold text-white mt-0.5">{habit.worstDay}</p>
-                                <p className="text-[7px] text-zinc-500">Solo il <span className="text-red-400">{habit.dayRate}%</span> di completamento</p>
+                                <p className="text-[7px] text-zinc-500">Only <span className="text-red-400">{habit.dayRate}%</span> completion</p>
                             </div>
                         </div>
                     ))}
@@ -692,8 +692,8 @@ function AlertTab({ stats }: { stats: typeof DEMO_STATS }) {
                         <TrendingDown className="w-3 h-3 text-red-400" />
                     </div>
                     <div>
-                        <h3 className="text-[10px] font-bold text-white">Analisi Worst Streaks</h3>
-                        <p className="text-[7px] text-zinc-500">Analisi dettagliata delle serie negative per identificare pattern e migliorare.</p>
+                        <h3 className="text-[10px] font-bold text-white">Worst Streaks Analysis</h3>
+                        <p className="text-[7px] text-zinc-500">Detailed analysis of negative streaks to identify patterns and improve.</p>
                     </div>
                 </div>
             </div>
@@ -707,7 +707,7 @@ function AbitudiniTab({ stats }: { stats: typeof DEMO_STATS }) {
         <div className="space-y-2">
             <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5">
                 <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-[10px] font-bold text-white">Dettagli Abitudini</h3>
+                    <h3 className="text-[10px] font-bold text-white">Habit Details</h3>
                     <div className="flex items-center gap-1 px-2 py-0.5 bg-zinc-700/50 rounded text-[7px] text-zinc-400">
                         <TrendingUp className="w-2 h-2" />
                         Rate
@@ -728,15 +728,15 @@ function AbitudiniTab({ stats }: { stats: typeof DEMO_STATS }) {
                                     <span className="text-yellow-500 flex items-center gap-0.5">
                                         <Trophy className="w-2 h-2" /> BEST
                                     </span>
-                                    <p className="font-bold text-white">{habit.longestStreak}<sub className="text-zinc-500">gg</sub></p>
+                                    <p className="font-bold text-white">{habit.longestStreak}<sub className="text-zinc-500">d</sub></p>
                                 </div>
                                 <div className="text-center">
                                     <span className="text-red-400">↘ WORST</span>
-                                    <p className="font-bold text-white">{habit.worstStreak}<sub className="text-zinc-500">gg</sub></p>
+                                    <p className="font-bold text-white">{habit.worstStreak}<sub className="text-zinc-500">d</sub></p>
                                 </div>
                                 <div className="text-center">
-                                    <span className="text-zinc-500">SERIE</span>
-                                    <p className="font-bold text-white">{habit.currentStreak}<sub className="text-zinc-500">gg</sub></p>
+                                    <span className="text-zinc-500">STREAK</span>
+                                    <p className="font-bold text-white">{habit.currentStreak}<sub className="text-zinc-500">d</sub></p>
                                 </div>
                                 <div className="text-center min-w-8">
                                     <span className="text-zinc-500">RATE</span>
@@ -761,14 +761,14 @@ function MoodTab() {
                     <Smile className="w-3 h-3 text-orange-400" />
                     <h3 className="text-[10px] font-bold text-white">Mood</h3>
                 </div>
-                <p className="text-[8px] text-zinc-500 mb-2">Queste abitudini hanno bisogno di un buon mood per essere completate</p>
+                <p className="text-[8px] text-zinc-500 mb-2">These habits need a good mood to be completed</p>
 
                 <div className="p-2 rounded-lg bg-zinc-900/50 border border-white/5 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-blue-500" />
                         <div>
                             <span className="text-[9px] text-white font-medium">Workout</span>
-                            <p className="text-[7px] text-zinc-500">45% con mood basso · 100% con mood alto</p>
+                            <p className="text-[7px] text-zinc-500">45% with low mood · 100% with high mood</p>
                         </div>
                     </div>
                     <div className="text-right">
@@ -782,16 +782,16 @@ function MoodTab() {
             <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5">
                 <div className="flex items-center gap-1.5 mb-2">
                     <Zap className="w-3 h-3 text-yellow-400" />
-                    <h3 className="text-[10px] font-bold text-white">Energia</h3>
+                    <h3 className="text-[10px] font-bold text-white">Energy</h3>
                 </div>
-                <p className="text-[8px] text-zinc-500 mb-2">Queste abitudini richiedono alta energia per essere completate</p>
+                <p className="text-[8px] text-zinc-500 mb-2">These habits require high energy to be completed</p>
 
                 <div className="p-2 rounded-lg bg-zinc-900/50 border border-white/5 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-purple-500" />
                         <div>
                             <span className="text-[9px] text-white font-medium">Meditation</span>
-                            <p className="text-[7px] text-zinc-500">30% con energia bassa · 95% con energia alta</p>
+                            <p className="text-[7px] text-zinc-500">30% with low energy · 95% with high energy</p>
                         </div>
                     </div>
                     <div className="text-right">
@@ -813,8 +813,8 @@ function DashboardContent({ activeView, setActiveView, onDayClick }: {
     onDayClick: (day: number) => void;
 }) {
     const tabs = [
-        { id: 'month' as ViewType, icon: Calendar, label: 'Mese' },
-        { id: 'week' as ViewType, icon: LayoutGrid, label: 'Settimana' },
+        { id: 'month' as ViewType, icon: Calendar, label: 'Month' },
+        { id: 'week' as ViewType, icon: LayoutGrid, label: 'Week' },
     ];
 
     return (
@@ -863,7 +863,7 @@ export function LandingDemo() {
     const navItems = [
         { id: 'dashboard' as PageType, icon: Calendar, label: 'Dashboard' },
         { id: 'goals' as PageType, icon: Target, label: 'Macro Goals' },
-        { id: 'stats' as PageType, icon: BarChart3, label: 'Statistiche' },
+        { id: 'stats' as PageType, icon: BarChart3, label: 'Statistics' },
     ];
 
     const handleDayClick = (day: number) => {
@@ -930,8 +930,8 @@ export function LandingDemo() {
                     <div className="w-56 bg-zinc-900/30 border-r border-white/5 p-4 space-y-4">
                         {/* Protocol Header */}
                         <div className="p-4 rounded-xl bg-zinc-800/30 border border-white/5">
-                            <h3 className="text-sm font-bold text-white">Protocollo</h3>
-                            <p className="text-[10px] text-zinc-500">Esecuzione giornaliera.</p>
+                            <h3 className="text-sm font-bold text-white">Protocol</h3>
+                            <p className="text-[10px] text-zinc-500">Daily execution.</p>
 
                             {/* Switches */}
                             <div className="flex gap-2 mt-3">
