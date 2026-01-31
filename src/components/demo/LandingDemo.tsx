@@ -398,120 +398,413 @@ function MacroGoalsView() {
 
 
 
-// Statistics View
+// Statistics View with Tabs
 function StatsView() {
+    const [activeTab, setActiveTab] = useState<'info' | 'trend' | 'alert' | 'abitudini' | 'mood'>('info');
     const stats = DEMO_STATS;
 
+    const statsTabs = [
+        { id: 'info' as const, label: 'Info' },
+        { id: 'trend' as const, label: 'Trend' },
+        { id: 'alert' as const, label: 'Alert' },
+        { id: 'abitudini' as const, label: 'Abitudini' },
+        { id: 'mood' as const, label: 'Mood' },
+    ];
+
     return (
-        <div className="space-y-4">
-            {/* KPI Cards */}
-            <div className="grid grid-cols-2 gap-2">
-                <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5 text-center">
-                    <p className="text-[8px] text-zinc-500 uppercase tracking-wider mb-1">Giorni Attivi</p>
-                    <p className="text-xl font-bold font-mono text-white">{stats.totalActiveDays}</p>
-                </div>
-                <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5 text-center">
-                    <p className="text-[8px] text-zinc-500 uppercase tracking-wider mb-1">Success Rate</p>
-                    <p className="text-xl font-bold font-mono text-green-400">{stats.globalSuccessRate}%</p>
-                </div>
-                <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5 text-center">
-                    <p className="text-[8px] text-zinc-500 uppercase tracking-wider mb-1">Best Streak</p>
-                    <p className="text-xl font-bold font-mono text-yellow-500">{stats.bestStreak}</p>
-                </div>
-                <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5 text-center">
-                    <p className="text-[8px] text-zinc-500 uppercase tracking-wider mb-1">Worst Day</p>
-                    <p className="text-sm font-bold font-mono text-red-400">{stats.worstDay}</p>
-                </div>
+        <div className="space-y-3">
+            {/* Goal Selector */}
+            <div className="flex items-center gap-2 px-3 py-2 bg-zinc-800/50 rounded-lg border border-white/5 w-fit">
+                <Target className="w-3 h-3 text-zinc-400" />
+                <span className="text-[10px] text-zinc-300">Tutti i Goals</span>
+                <ChevronRight className="w-3 h-3 text-zinc-500 rotate-90" />
             </div>
 
-            {/* Trend Chart */}
-            <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5">
-                <h3 className="text-[10px] font-bold text-white mb-3 flex items-center gap-1">
-                    <TrendingUp className="w-3 h-3 text-green-500" />
-                    Trend Completamento
-                </h3>
-                <div className="h-16 flex items-end gap-0.5">
-                    {stats.trendData.map((d, i) => (
-                        <div
-                            key={i}
-                            className="flex-1 bg-purple-500/60 rounded-t transition-all hover:bg-purple-500"
-                            style={{ height: `${d.value}%` }}
-                            title={`${d.date}: ${d.value}%`}
-                        />
-                    ))}
-                </div>
+            {/* Stats Tabs */}
+            <div className="flex bg-zinc-800/30 rounded-lg p-0.5 border border-white/5">
+                {statsTabs.map(tab => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`flex-1 py-1.5 text-[9px] font-medium rounded-md transition-all ${activeTab === tab.id
+                            ? 'bg-zinc-700/70 text-white'
+                            : 'text-zinc-500 hover:text-zinc-300'
+                            }`}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
             </div>
 
-            {/* Day of Week Performance */}
-            <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5">
-                <h3 className="text-[10px] font-bold text-white mb-3 flex items-center gap-1">
-                    <Calendar className="w-3 h-3 text-purple-400" />
-                    Performance Settimanale
-                </h3>
-                <div className="grid grid-cols-7 gap-1">
-                    {stats.weekdayStats.map((d, i) => (
-                        <div key={i} className="text-center">
-                            <p className="text-[7px] text-zinc-500 mb-1">{d.day}</p>
-                            <div className="h-12 bg-zinc-700/30 rounded relative overflow-hidden">
-                                <div
-                                    className="absolute bottom-0 left-0 right-0 rounded-t"
-                                    style={{
-                                        height: `${d.rate}%`,
-                                        backgroundColor: d.rate >= 70 ? '#22c55e' : d.rate >= 50 ? '#f59e0b' : '#ef4444'
-                                    }}
-                                />
-                            </div>
-                            <p className="text-[8px] font-bold mt-1">{d.rate}%</p>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Habit Details */}
-            <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5">
-                <h3 className="text-[10px] font-bold text-white mb-3 flex items-center gap-1">
-                    <Target className="w-3 h-3 text-blue-400" />
-                    Dettagli Abitudini
-                </h3>
-                <div className="space-y-2">
-                    {stats.habitStats.slice(0, 3).map(habit => (
-                        <div key={habit.id} className="flex items-center gap-2 p-2 rounded-lg bg-zinc-900/50">
-                            <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: habit.color }} />
-                            <span className="text-[9px] text-white flex-1">{habit.title}</span>
-                            <div className="flex items-center gap-3 text-[8px]">
-                                <div className="flex items-center gap-0.5">
-                                    <Trophy className="w-2.5 h-2.5 text-yellow-500" />
-                                    <span className="text-zinc-400">{habit.longestStreak}</span>
-                                </div>
-                                <div className="flex items-center gap-0.5">
-                                    <Flame className="w-2.5 h-2.5 text-orange-500" />
-                                    <span className="text-zinc-400">{habit.currentStreak}</span>
-                                </div>
-                                <span className="font-bold text-green-400">{habit.completionRate}%</span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Critical Analysis */}
-            {stats.criticalHabits.length > 0 && (
-                <div className="p-3 rounded-xl bg-red-500/5 border border-red-500/20">
-                    <h3 className="text-[10px] font-bold text-red-400 mb-2 flex items-center gap-1">
-                        <AlertTriangle className="w-3 h-3" />
-                        Attenzione Richiesta
-                    </h3>
-                    {stats.criticalHabits.map((habit, i) => (
-                        <div key={i} className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: habit.color }} />
-                            <span className="text-[9px] text-zinc-300">{habit.title}: {habit.issue}</span>
-                        </div>
-                    ))}
-                </div>
-            )}
+            {/* Tab Content */}
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={activeTab}
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    transition={{ duration: 0.15 }}
+                >
+                    {activeTab === 'info' && <InfoTab stats={stats} />}
+                    {activeTab === 'trend' && <TrendTab />}
+                    {activeTab === 'alert' && <AlertTab stats={stats} />}
+                    {activeTab === 'abitudini' && <AbitudiniTab stats={stats} />}
+                    {activeTab === 'mood' && <MoodTab />}
+                </motion.div>
+            </AnimatePresence>
         </div>
     );
 }
+
+// Info Tab - Overview + Keystone Habits
+function InfoTab({ stats }: { stats: typeof DEMO_STATS }) {
+    return (
+        <div className="space-y-3">
+            {/* KPI Cards */}
+            <div className="grid grid-cols-4 gap-2">
+                <div className="p-2 rounded-xl bg-zinc-800/30 border border-white/5">
+                    <div className="flex items-center gap-1 mb-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                        <span className="text-[7px] text-zinc-500">Completamento</span>
+                    </div>
+                    <p className="text-lg font-bold text-white">{stats.globalSuccessRate}%</p>
+                    <p className="text-[7px] text-zinc-600">globale</p>
+                </div>
+                <div className="p-2 rounded-xl bg-zinc-800/30 border border-white/5">
+                    <div className="flex items-center gap-1 mb-1">
+                        <Flame className="w-2 h-2 text-orange-500" />
+                        <span className="text-[7px] text-zinc-500">Miglior Serie</span>
+                    </div>
+                    <p className="text-lg font-bold text-white">{stats.bestStreak}</p>
+                    <p className="text-[7px] text-zinc-600">giorni</p>
+                </div>
+                <div className="p-2 rounded-xl bg-zinc-800/30 border border-white/5">
+                    <div className="flex items-center gap-1 mb-1">
+                        <Trophy className="w-2 h-2 text-yellow-500" />
+                        <span className="text-[7px] text-zinc-500">Top Performer</span>
+                    </div>
+                    <p className="text-[10px] font-bold text-white leading-tight">Meditation</p>
+                    <p className="text-[7px] text-zinc-600">97% completamento</p>
+                </div>
+                <div className="p-2 rounded-xl bg-zinc-800/30 border border-white/5">
+                    <div className="flex items-center gap-1 mb-1">
+                        <AlertTriangle className="w-2 h-2 text-yellow-500" />
+                        <span className="text-[7px] text-zinc-500">Giorno Peggiore</span>
+                    </div>
+                    <p className="text-sm font-bold text-white">{stats.worstDay}</p>
+                    <p className="text-[7px] text-zinc-600">Focus richiesto</p>
+                </div>
+            </div>
+
+            {/* Keystone Habits */}
+            <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5">
+                <div className="flex items-center gap-2 mb-3">
+                    <div className="p-1.5 rounded-lg bg-yellow-500/20">
+                        <Trophy className="w-3 h-3 text-yellow-500" />
+                    </div>
+                    <div>
+                        <h3 className="text-[10px] font-bold text-white">Abitudini Chiave</h3>
+                        <p className="text-[8px] text-zinc-500">Abitudini che influenzano positivamente molte altre</p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                    {stats.habitStats.slice(0, 3).map((habit, i) => (
+                        <div key={habit.id} className="p-2 rounded-lg bg-zinc-900/50 border border-white/5">
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-1.5">
+                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: habit.color }} />
+                                    <span className="text-[8px] text-white font-medium">{habit.title}</span>
+                                </div>
+                                <Trophy className="w-2.5 h-2.5 text-blue-400" />
+                            </div>
+                            <span className="text-[7px] px-1 py-0.5 rounded bg-green-500/20 text-green-400">Impatto Basso</span>
+                            <p className="text-[7px] text-zinc-500 mt-1">2 connessioni</p>
+                            <div className="mt-2 space-y-1">
+                                {stats.habitStats.slice(i + 1, i + 3).map(h => (
+                                    <div key={h.id} className="flex justify-between text-[7px]">
+                                        <span className="text-zinc-400">{h.title}</span>
+                                        <span className="text-green-400">+{(0.5 + Math.random() * 0.5).toFixed(2)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="flex justify-between text-[7px] mt-2 pt-1 border-t border-white/5">
+                                <span className="text-zinc-500">↗ Media</span>
+                                <span className="font-bold text-green-400">+0.74</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// Trend Tab - Area Chart with dynamic data per timeframe
+function TrendTab() {
+    const [period, setPeriod] = useState<'sett' | 'mese' | 'anno' | 'tutto'>('sett');
+
+    // Different data for each period
+    const periodData = {
+        sett: {
+            labels: ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'],
+            points: [80, 75, 70, 68, 72, 85, 20]
+        },
+        mese: {
+            labels: ['Sett 1', 'Sett 2', 'Sett 3', 'Sett 4'],
+            points: [72, 78, 65, 82]
+        },
+        anno: {
+            labels: ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'],
+            points: [45, 52, 60, 68, 75, 72, 78, 82, 85, 80, 76, 88]
+        },
+        tutto: {
+            labels: ['2024', '2025', '2026'],
+            points: [55, 72, 78]
+        }
+    };
+
+    const currentData = periodData[period];
+    const points = currentData.points;
+    const numPoints = points.length;
+
+    // Generate smooth path
+    const generatePath = (pts: number[], asFill: boolean) => {
+        const h = 60;
+        const scale = 0.55;
+        let path = `M0,${h - pts[0] * scale}`;
+
+        for (let i = 1; i < pts.length; i++) {
+            const x = (i / (pts.length - 1)) * 100;
+            const y = h - pts[i] * scale;
+            const prevX = ((i - 1) / (pts.length - 1)) * 100;
+            const cpX = (prevX + x) / 2;
+            path += ` C${cpX},${h - pts[i - 1] * scale} ${cpX},${y} ${x},${y}`;
+        }
+
+        if (asFill) {
+            path += ` V${h} H0 Z`;
+        }
+        return path;
+    };
+
+    return (
+        <div className="space-y-3">
+            <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5">
+                <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-[10px] font-bold text-white">Trend</h3>
+                    <div className="flex bg-zinc-700/50 rounded-md p-0.5">
+                        {(['sett', 'mese', 'anno', 'tutto'] as const).map(p => (
+                            <button
+                                key={p}
+                                onClick={() => setPeriod(p)}
+                                className={`px-2 py-0.5 text-[7px] rounded transition-all ${period === p ? 'bg-zinc-600 text-white' : 'text-zinc-400'
+                                    }`}
+                            >
+                                {p.charAt(0).toUpperCase() + p.slice(1)}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Area Chart */}
+                <div className="relative h-24 mt-4">
+                    <svg viewBox="0 0 100 60" className="w-full h-full" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="white" stopOpacity="0.3" />
+                                <stop offset="100%" stopColor="white" stopOpacity="0" />
+                            </linearGradient>
+                        </defs>
+                        {/* Area fill */}
+                        <path
+                            d={generatePath(points, true)}
+                            fill="url(#areaGradient)"
+                        />
+                        {/* Line */}
+                        <path
+                            d={generatePath(points, false)}
+                            fill="none"
+                            stroke="white"
+                            strokeWidth="0.8"
+                        />
+                    </svg>
+                </div>
+
+                {/* X Axis Labels */}
+                <div className="flex justify-between mt-2">
+                    {currentData.labels.map(label => (
+                        <span key={label} className="text-[7px] text-zinc-500">{label}</span>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// Alert Tab - Areas of Improvement + Worst Streaks
+function AlertTab({ stats }: { stats: typeof DEMO_STATS }) {
+    const criticalHabits = [
+        { title: 'Reading', color: '#F59E0B', rate: 27, worstDay: 'martedì', dayRate: 0 },
+        { title: 'Coding', color: '#3B82F6', rate: 36, worstDay: 'martedì', dayRate: 0 },
+        { title: 'Journal', color: '#EC4899', rate: 37, worstDay: 'giovedì', dayRate: 17 },
+    ];
+
+    return (
+        <div className="space-y-3">
+            {/* Areas of Improvement */}
+            <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5">
+                <div className="flex items-center gap-2 mb-3">
+                    <Target className="w-3 h-3 text-zinc-400" />
+                    <div>
+                        <h3 className="text-[10px] font-bold text-white">Aree di Miglioramento</h3>
+                        <p className="text-[7px] text-zinc-500">Abitudini che richiedono più attenzione e i loro giorni critici</p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                    {criticalHabits.map((habit, i) => (
+                        <div key={i} className="p-2 rounded-lg bg-zinc-900/50 border border-white/5">
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-1.5">
+                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: habit.color }} />
+                                    <span className="text-[8px] text-white font-medium">{habit.title}</span>
+                                </div>
+                                <span className="text-[7px] text-red-400">{habit.rate}% succ.</span>
+                            </div>
+                            <div className="mt-2">
+                                <div className="flex items-center gap-1 text-[7px] text-zinc-500">
+                                    <AlertTriangle className="w-2 h-2" />
+                                    <span>GIORNO NERO</span>
+                                </div>
+                                <p className="text-[10px] font-bold text-white mt-0.5">{habit.worstDay}</p>
+                                <p className="text-[7px] text-zinc-500">Solo il <span className="text-red-400">{habit.dayRate}%</span> di completamento</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Worst Streaks Analysis */}
+            <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5">
+                <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-red-500/20">
+                        <TrendingDown className="w-3 h-3 text-red-400" />
+                    </div>
+                    <div>
+                        <h3 className="text-[10px] font-bold text-white">Analisi Worst Streaks</h3>
+                        <p className="text-[7px] text-zinc-500">Analisi dettagliata delle serie negative per identificare pattern e migliorare.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// Abitudini Tab - Habit List with Stats
+function AbitudiniTab({ stats }: { stats: typeof DEMO_STATS }) {
+    return (
+        <div className="space-y-2">
+            <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5">
+                <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-[10px] font-bold text-white">Dettagli Abitudini</h3>
+                    <div className="flex items-center gap-1 px-2 py-0.5 bg-zinc-700/50 rounded text-[7px] text-zinc-400">
+                        <TrendingUp className="w-2 h-2" />
+                        Rate
+                        <ChevronRight className="w-2 h-2 rotate-90" />
+                    </div>
+                </div>
+
+                <div className="space-y-1.5">
+                    {stats.habitStats.map(habit => (
+                        <div key={habit.id} className="flex items-center gap-3 p-2 rounded-lg bg-zinc-900/50 border border-white/5">
+                            <div className="flex items-center gap-2 flex-1">
+                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: habit.color }} />
+                                <span className="text-[9px] text-white font-medium">{habit.title}</span>
+                                <div className="h-0.5 flex-1 max-w-12 rounded-full" style={{ backgroundColor: habit.color, opacity: 0.6 }} />
+                            </div>
+                            <div className="flex items-center gap-4 text-[7px]">
+                                <div className="text-center">
+                                    <span className="text-yellow-500 flex items-center gap-0.5">
+                                        <Trophy className="w-2 h-2" /> BEST
+                                    </span>
+                                    <p className="font-bold text-white">{habit.longestStreak}<sub className="text-zinc-500">gg</sub></p>
+                                </div>
+                                <div className="text-center">
+                                    <span className="text-red-400">↘ WORST</span>
+                                    <p className="font-bold text-white">{habit.worstStreak}<sub className="text-zinc-500">gg</sub></p>
+                                </div>
+                                <div className="text-center">
+                                    <span className="text-zinc-500">SERIE</span>
+                                    <p className="font-bold text-white">{habit.currentStreak}<sub className="text-zinc-500">gg</sub></p>
+                                </div>
+                                <div className="text-center min-w-8">
+                                    <span className="text-zinc-500">RATE</span>
+                                    <p className="font-bold text-green-400">{habit.completionRate}%</p>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// Mood Tab - Only Mood and Energy boxes
+function MoodTab() {
+    return (
+        <div className="space-y-3">
+            {/* Mood Section */}
+            <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5">
+                <div className="flex items-center gap-1.5 mb-2">
+                    <Smile className="w-3 h-3 text-orange-400" />
+                    <h3 className="text-[10px] font-bold text-white">Mood</h3>
+                </div>
+                <p className="text-[8px] text-zinc-500 mb-2">Queste abitudini hanno bisogno di un buon mood per essere completate</p>
+
+                <div className="p-2 rounded-lg bg-zinc-900/50 border border-white/5 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-blue-500" />
+                        <div>
+                            <span className="text-[9px] text-white font-medium">Workout</span>
+                            <p className="text-[7px] text-zinc-500">45% con mood basso · 100% con mood alto</p>
+                        </div>
+                    </div>
+                    <div className="text-right">
+                        <span className="text-[7px] text-zinc-500">Drop</span>
+                        <p className="text-[11px] font-bold text-red-400">55%</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Energy Section */}
+            <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5">
+                <div className="flex items-center gap-1.5 mb-2">
+                    <Zap className="w-3 h-3 text-yellow-400" />
+                    <h3 className="text-[10px] font-bold text-white">Energia</h3>
+                </div>
+                <p className="text-[8px] text-zinc-500 mb-2">Queste abitudini richiedono alta energia per essere completate</p>
+
+                <div className="p-2 rounded-lg bg-zinc-900/50 border border-white/5 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-purple-500" />
+                        <div>
+                            <span className="text-[9px] text-white font-medium">Meditation</span>
+                            <p className="text-[7px] text-zinc-500">30% con energia bassa · 95% con energia alta</p>
+                        </div>
+                    </div>
+                    <div className="text-right">
+                        <span className="text-[7px] text-zinc-500">Drop</span>
+                        <p className="text-[11px] font-bold text-red-400">65%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+
 
 // Dashboard Content with tabs
 function DashboardContent({ activeView, setActiveView, onDayClick }: {

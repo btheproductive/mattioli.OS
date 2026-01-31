@@ -8,20 +8,20 @@
 - **Visibility**: Desktop only (`hidden lg:block`), hidden on mobile/tablet.
 - **Navigation Bar**: Top navigation with 3 sections:
   - **Dashboard**: Habit tracking with Month/Week views
-  - **Macro Goals**: Progress tracking for long-term goals with categories and deadlines
-  - **Statistiche**: Full stats view with KPIs, trend charts, weekly performance, and habit details
+  - **Macro Goals**: Full-screen CTA encouraging users to try the app on GitHub
+  - **Statistiche**: Complete stats view with 5 tabs matching the web app
 - **Interactive Features**:
   - **Tab Navigation**: Working tabs to switch between Month and Week views
   - **Page Navigation**: Click navbar to switch between Dashboard, Macro Goals, and Stats
   - **Clickable Days**: Click any past day to open modal with habit completion details
   - **Animated Transitions**: Smooth animations when switching views
-- **Statistics View Components**:
-  - KPI cards (Active Days, Success Rate, Best Streak, Worst Day)
-  - Trend completion chart
-  - Weekly performance bar chart
-  - Habit details with streaks and rates
-  - Critical analysis alerts
-- **Static Data**: 5 demo habits + 4 macro goals with realistic patterns (no database)
+- **Statistics View (5 Tabs)**:
+  - **Info**: 4 KPI cards (Completamento, Miglior Serie, Top Performer, Giorno Peggiore) + Abitudini Chiave section with correlations
+  - **Trend**: Area chart with period selector (Sett/Mese/Anno/Tutto)
+  - **Alert**: Aree di Miglioramento + Analisi Worst Streaks
+  - **Abitudini**: Full habit list with BEST, WORST, SERIE, RATE stats
+  - **Mood**: Mood & Energy vs Productivity chart + mood/energy correlation sections
+- **Static Data**: 5 demo habits with realistic patterns (no database)
 - **Files Created**: `src/components/demo/LandingDemo.tsx`
 - **Files Modified**: `src/pages/LandingPage.tsx`
 - **Testing**: Build verified successfully.
