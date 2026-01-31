@@ -6,16 +6,22 @@
 - **New Feature**: Added a fully interactive demo preview of the app to the landing page.
 - **Location**: Placed between the Hero section and the 6 feature boxes.
 - **Visibility**: Desktop only (`hidden lg:block`), hidden on mobile/tablet.
+- **Navigation Bar**: Top navigation with 3 sections:
+  - **Dashboard**: Habit tracking with Month/Week views
+  - **Macro Goals**: Progress tracking for long-term goals with categories and deadlines
+  - **Statistiche**: Full stats view with KPIs, trend charts, weekly performance, and habit details
 - **Interactive Features**:
-  - **Tab Navigation**: Working tabs to switch between Month, Week, Year, and Life views
-  - **Clickable Days**: Click any past day to open a modal showing habit completion details
-  - **Animated Transitions**: Smooth animations when switching views and opening modals
-- **Demo Views**:
-  - **Month View**: Full January 2026 calendar with colored habit dots
-  - **Week View**: Weekly grid with habit completion bars
-  - **Year View**: Annual heatmap overview
-  - **Life View**: Memento Mori weeks visualization
-- **Static Data**: 5 demo habits with realistic completion patterns (no database)
+  - **Tab Navigation**: Working tabs to switch between Month and Week views
+  - **Page Navigation**: Click navbar to switch between Dashboard, Macro Goals, and Stats
+  - **Clickable Days**: Click any past day to open modal with habit completion details
+  - **Animated Transitions**: Smooth animations when switching views
+- **Statistics View Components**:
+  - KPI cards (Active Days, Success Rate, Best Streak, Worst Day)
+  - Trend completion chart
+  - Weekly performance bar chart
+  - Habit details with streaks and rates
+  - Critical analysis alerts
+- **Static Data**: 5 demo habits + 4 macro goals with realistic patterns (no database)
 - **Files Created**: `src/components/demo/LandingDemo.tsx`
 - **Files Modified**: `src/pages/LandingPage.tsx`
 - **Testing**: Build verified successfully.

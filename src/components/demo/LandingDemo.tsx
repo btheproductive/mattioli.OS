@@ -4,7 +4,8 @@ import {
     Settings, Download, FileText, Database, Trash2,
     Wifi, Calendar, LayoutGrid,
     ChevronLeft, ChevronRight, Zap, Smile, Check, X,
-    XCircle
+    XCircle, BarChart3, Target, Trophy, TrendingUp, TrendingDown,
+    Flame, AlertTriangle
 } from "lucide-react";
 
 // Static demo data - habits with colors
@@ -16,11 +17,18 @@ const DEMO_HABITS = [
     { id: '5', title: 'Journal', color: '#EC4899', start_date: '2026-01-01' },
 ];
 
+// Demo macro goals
+const DEMO_MACRO_GOALS = [
+    { id: 'm1', title: 'Complete 30-day meditation challenge', category: 'Health', deadline: '2026-02-15', progress: 60, status: 'in_progress' },
+    { id: 'm2', title: 'Read 12 books this year', category: 'Learning', deadline: '2026-12-31', progress: 8, status: 'in_progress' },
+    { id: 'm3', title: 'Run a half marathon', category: 'Fitness', deadline: '2026-06-01', progress: 35, status: 'in_progress' },
+    { id: 'm4', title: 'Learn TypeScript basics', category: 'Career', deadline: '2026-01-31', progress: 100, status: 'completed' },
+];
+
 // Generate demo calendar data for January 2026
 const generateDemoData = () => {
     const data: Record<string, Record<string, 'done' | 'missed' | null>> = {};
 
-    // Fixed seed for consistent demo data
     const seedRandom = (seed: number) => {
         const x = Math.sin(seed) * 10000;
         return x - Math.floor(x);
@@ -46,10 +54,51 @@ const generateDemoData = () => {
     return data;
 };
 
+// Generate demo stats
+const generateDemoStats = () => {
+    const habitStats = DEMO_HABITS.map((habit, i) => ({
+        id: habit.id,
+        title: habit.title,
+        color: habit.color,
+        completionRate: 65 + Math.floor(Math.sin(i * 2) * 20),
+        currentStreak: 3 + i,
+        longestStreak: 12 + i * 2,
+        worstStreak: 2 + i,
+        totalDone: 14 + i,
+        totalMissed: 4 - Math.floor(i / 2),
+    }));
+
+    return {
+        totalActiveDays: 18,
+        globalSuccessRate: 78,
+        bestStreak: 14,
+        worstDay: 'Lunedì',
+        habitStats,
+        weekdayStats: [
+            { day: 'Lun', rate: 65 },
+            { day: 'Mar', rate: 82 },
+            { day: 'Mer', rate: 75 },
+            { day: 'Gio', rate: 88 },
+            { day: 'Ven', rate: 70 },
+            { day: 'Sab', rate: 55 },
+            { day: 'Dom', rate: 48 },
+        ],
+        trendData: Array.from({ length: 18 }, (_, i) => ({
+            date: `${i + 1}/01`,
+            value: 60 + Math.floor(Math.sin(i) * 25 + Math.random() * 10)
+        })),
+        criticalHabits: [
+            { title: 'Journal', issue: 'Streak interrotto 3 volte questa settimana', color: '#EC4899' },
+        ]
+    };
+};
+
 const DEMO_RECORDS = generateDemoData();
+const DEMO_STATS = generateDemoStats();
 const DAYS = ['LUN', 'MAR', 'MER', 'GIO', 'VEN', 'SAB', 'DOM'];
 const DAYS_FULL = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 
+type PageType = 'dashboard' | 'goals' | 'stats';
 type ViewType = 'month' | 'week';
 
 // Day Details Modal Component
@@ -139,9 +188,8 @@ function DemoDayModal({
 
 // Monthly Calendar View
 function MonthView({ onDayClick }: { onDayClick: (day: number) => void }) {
-    const startDay = 3; // January 2026 starts on Thursday
+    const startDay = 3;
     const daysInMonth = 31;
-    const numRows = Math.ceil((startDay + daysInMonth) / 7);
 
     const renderCalendarDays = () => {
         const cells = [];
@@ -236,7 +284,7 @@ function MonthView({ onDayClick }: { onDayClick: (day: number) => void }) {
 
 // Weekly View
 function WeekView({ onDayClick }: { onDayClick: (day: number) => void }) {
-    const weekDays = [12, 13, 14, 15, 16, 17, 18]; // Week of Jan 12-18
+    const weekDays = [12, 13, 14, 15, 16, 17, 18];
 
     return (
         <div className="bg-zinc-900/30 rounded-xl border border-white/5 p-4">
@@ -300,14 +348,229 @@ function WeekView({ onDayClick }: { onDayClick: (day: number) => void }) {
     );
 }
 
+// Macro Goals View
+function MacroGoalsView() {
+    return (
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+            {/* Animated gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-zinc-900 to-blue-900/40" />
+            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
 
-export function LandingDemo() {
-    const [activeView, setActiveView] = useState<ViewType>('month');
-    const [selectedDay, setSelectedDay] = useState<number | null>(null);
+            {/* Content */}
+            <div className="relative z-10 text-center px-8 max-w-md">
+                {/* Icon with glow */}
+                <div className="relative inline-block mb-6">
+                    <div className="absolute inset-0 bg-purple-500/30 blur-2xl rounded-full scale-150" />
+                    <div className="relative text-6xl">🎯</div>
+                </div>
 
+                {/* Title */}
+                <h2 className="text-xl font-bold text-white mb-3">
+                    <span className="text-purple-400">Aspetta...</span> hai cliccato sui Macro Goals?
+                </h2>
+
+                {/* Description */}
+                <p className="text-sm text-zinc-400 mb-6 leading-relaxed">
+                    Sembra che tu abbia bisogno di organizzare la tua vita.<br />
+                    <span className="text-zinc-300">Ottima notizia: sei nel posto giusto!</span>
+                </p>
+
+                {/* CTA Button */}
+                <a
+                    href="https://github.com/simo-hue/habit-tracker"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-8 py-3 text-sm font-bold text-white bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 rounded-xl transition-all hover:scale-105 shadow-xl shadow-purple-500/30"
+                >
+                    <span>🚀</span>
+                    Inizia su GitHub — È gratis!
+                </a>
+
+                {/* Subtle footer */}
+                <p className="mt-6 text-[10px] text-zinc-600">
+                    Open source • Self-hosted • Privacy-first
+                </p>
+            </div>
+        </div>
+    );
+}
+
+
+
+// Statistics View
+function StatsView() {
+    const stats = DEMO_STATS;
+
+    return (
+        <div className="space-y-4">
+            {/* KPI Cards */}
+            <div className="grid grid-cols-2 gap-2">
+                <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5 text-center">
+                    <p className="text-[8px] text-zinc-500 uppercase tracking-wider mb-1">Giorni Attivi</p>
+                    <p className="text-xl font-bold font-mono text-white">{stats.totalActiveDays}</p>
+                </div>
+                <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5 text-center">
+                    <p className="text-[8px] text-zinc-500 uppercase tracking-wider mb-1">Success Rate</p>
+                    <p className="text-xl font-bold font-mono text-green-400">{stats.globalSuccessRate}%</p>
+                </div>
+                <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5 text-center">
+                    <p className="text-[8px] text-zinc-500 uppercase tracking-wider mb-1">Best Streak</p>
+                    <p className="text-xl font-bold font-mono text-yellow-500">{stats.bestStreak}</p>
+                </div>
+                <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5 text-center">
+                    <p className="text-[8px] text-zinc-500 uppercase tracking-wider mb-1">Worst Day</p>
+                    <p className="text-sm font-bold font-mono text-red-400">{stats.worstDay}</p>
+                </div>
+            </div>
+
+            {/* Trend Chart */}
+            <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5">
+                <h3 className="text-[10px] font-bold text-white mb-3 flex items-center gap-1">
+                    <TrendingUp className="w-3 h-3 text-green-500" />
+                    Trend Completamento
+                </h3>
+                <div className="h-16 flex items-end gap-0.5">
+                    {stats.trendData.map((d, i) => (
+                        <div
+                            key={i}
+                            className="flex-1 bg-purple-500/60 rounded-t transition-all hover:bg-purple-500"
+                            style={{ height: `${d.value}%` }}
+                            title={`${d.date}: ${d.value}%`}
+                        />
+                    ))}
+                </div>
+            </div>
+
+            {/* Day of Week Performance */}
+            <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5">
+                <h3 className="text-[10px] font-bold text-white mb-3 flex items-center gap-1">
+                    <Calendar className="w-3 h-3 text-purple-400" />
+                    Performance Settimanale
+                </h3>
+                <div className="grid grid-cols-7 gap-1">
+                    {stats.weekdayStats.map((d, i) => (
+                        <div key={i} className="text-center">
+                            <p className="text-[7px] text-zinc-500 mb-1">{d.day}</p>
+                            <div className="h-12 bg-zinc-700/30 rounded relative overflow-hidden">
+                                <div
+                                    className="absolute bottom-0 left-0 right-0 rounded-t"
+                                    style={{
+                                        height: `${d.rate}%`,
+                                        backgroundColor: d.rate >= 70 ? '#22c55e' : d.rate >= 50 ? '#f59e0b' : '#ef4444'
+                                    }}
+                                />
+                            </div>
+                            <p className="text-[8px] font-bold mt-1">{d.rate}%</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Habit Details */}
+            <div className="p-3 rounded-xl bg-zinc-800/30 border border-white/5">
+                <h3 className="text-[10px] font-bold text-white mb-3 flex items-center gap-1">
+                    <Target className="w-3 h-3 text-blue-400" />
+                    Dettagli Abitudini
+                </h3>
+                <div className="space-y-2">
+                    {stats.habitStats.slice(0, 3).map(habit => (
+                        <div key={habit.id} className="flex items-center gap-2 p-2 rounded-lg bg-zinc-900/50">
+                            <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: habit.color }} />
+                            <span className="text-[9px] text-white flex-1">{habit.title}</span>
+                            <div className="flex items-center gap-3 text-[8px]">
+                                <div className="flex items-center gap-0.5">
+                                    <Trophy className="w-2.5 h-2.5 text-yellow-500" />
+                                    <span className="text-zinc-400">{habit.longestStreak}</span>
+                                </div>
+                                <div className="flex items-center gap-0.5">
+                                    <Flame className="w-2.5 h-2.5 text-orange-500" />
+                                    <span className="text-zinc-400">{habit.currentStreak}</span>
+                                </div>
+                                <span className="font-bold text-green-400">{habit.completionRate}%</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Critical Analysis */}
+            {stats.criticalHabits.length > 0 && (
+                <div className="p-3 rounded-xl bg-red-500/5 border border-red-500/20">
+                    <h3 className="text-[10px] font-bold text-red-400 mb-2 flex items-center gap-1">
+                        <AlertTriangle className="w-3 h-3" />
+                        Attenzione Richiesta
+                    </h3>
+                    {stats.criticalHabits.map((habit, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: habit.color }} />
+                            <span className="text-[9px] text-zinc-300">{habit.title}: {habit.issue}</span>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+// Dashboard Content with tabs
+function DashboardContent({ activeView, setActiveView, onDayClick }: {
+    activeView: ViewType;
+    setActiveView: (v: ViewType) => void;
+    onDayClick: (day: number) => void;
+}) {
     const tabs = [
         { id: 'month' as ViewType, icon: Calendar, label: 'Mese' },
         { id: 'week' as ViewType, icon: LayoutGrid, label: 'Settimana' },
+    ];
+
+    return (
+        <div>
+            {/* Tabs */}
+            <div className="flex justify-center mb-4">
+                <div className="inline-flex bg-zinc-800/30 rounded-lg p-1 border border-white/5">
+                    {tabs.map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveView(tab.id)}
+                            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-[10px] font-medium transition-all ${activeView === tab.id
+                                ? 'bg-zinc-700/50 text-white'
+                                : 'text-zinc-500 hover:text-zinc-300'
+                                }`}
+                        >
+                            <tab.icon className="w-3 h-3" />
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* View Content */}
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={activeView}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                >
+                    {activeView === 'month' && <MonthView onDayClick={onDayClick} />}
+                    {activeView === 'week' && <WeekView onDayClick={onDayClick} />}
+                </motion.div>
+            </AnimatePresence>
+        </div>
+    );
+}
+
+export function LandingDemo() {
+    const [activePage, setActivePage] = useState<PageType>('dashboard');
+    const [activeView, setActiveView] = useState<ViewType>('month');
+    const [selectedDay, setSelectedDay] = useState<number | null>(null);
+
+    const navItems = [
+        { id: 'dashboard' as PageType, icon: Calendar, label: 'Dashboard' },
+        { id: 'goals' as PageType, icon: Target, label: 'Macro Goals' },
+        { id: 'stats' as PageType, icon: BarChart3, label: 'Statistiche' },
     ];
 
     const handleDayClick = (day: number) => {
@@ -339,6 +602,26 @@ export function LandingDemo() {
                             dashboard.mattioli.os
                         </div>
                     </div>
+                </div>
+
+                {/* Top Navigation Bar */}
+                <div className="flex items-center justify-center gap-1 px-4 py-2 bg-zinc-900/50 border-b border-white/5">
+                    {navItems.map(item => (
+                        <button
+                            key={item.id}
+                            onClick={() => setActivePage(item.id)}
+                            className={`
+                                flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all
+                                ${activePage === item.id
+                                    ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                                    : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5 border border-transparent'
+                                }
+                            `}
+                        >
+                            <item.icon className="w-3 h-3" />
+                            {item.label}
+                        </button>
+                    ))}
                 </div>
 
                 {/* App content */}
@@ -440,36 +723,23 @@ export function LandingDemo() {
 
                     {/* Main content */}
                     <div className="flex-1 p-4">
-                        {/* Tabs */}
-                        <div className="flex justify-center mb-4">
-                            <div className="inline-flex bg-zinc-800/30 rounded-lg p-1 border border-white/5">
-                                {tabs.map(tab => (
-                                    <button
-                                        key={tab.id}
-                                        onClick={() => setActiveView(tab.id)}
-                                        className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-[10px] font-medium transition-all ${activeView === tab.id
-                                            ? 'bg-zinc-700/50 text-white'
-                                            : 'text-zinc-500 hover:text-zinc-300'
-                                            }`}
-                                    >
-                                        <tab.icon className="w-3 h-3" />
-                                        {tab.label}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* View Content */}
                         <AnimatePresence mode="wait">
                             <motion.div
-                                key={activeView}
+                                key={activePage}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                {activeView === 'month' && <MonthView onDayClick={handleDayClick} />}
-                                {activeView === 'week' && <WeekView onDayClick={handleDayClick} />}
+                                {activePage === 'dashboard' && (
+                                    <DashboardContent
+                                        activeView={activeView}
+                                        setActiveView={setActiveView}
+                                        onDayClick={handleDayClick}
+                                    />
+                                )}
+                                {activePage === 'goals' && <MacroGoalsView />}
+                                {activePage === 'stats' && <StatsView />}
                             </motion.div>
                         </AnimatePresence>
                     </div>
@@ -478,7 +748,7 @@ export function LandingDemo() {
 
             {/* Label */}
             <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-zinc-900 border border-white/10 rounded-full text-xs text-zinc-400">
-                ✨ Interactive Demo — Click on any day to see details
+                ✨ Interactive Demo — Explore all sections
             </div>
         </motion.div>
     );
