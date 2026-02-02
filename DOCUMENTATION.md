@@ -2,6 +2,28 @@
 
 ## 📅 Log Modifiche (Ultimi aggiornamenti)
 
+### [2026-02-02] Fix Calcolo Settimana Corrente (Macro Goals)
+- **Problema**: Il sistema calcolava erroneamente la settimana corrente. Ad esempio, il 2 Febbraio 2026 (Lunedì) veniva considerato "Settimana 2" invece di "Settimana 1", causando:
+  - Navigazione alla settimana sbagliata nella sezione Goals Settimanali
+  - Obiettivi attuali marcati come "falliti" prematuramente
+- **Causa**: La funzione `getWeekOfMonth` di date-fns utilizza la logica ISO settimanale dove:
+  - 1 Feb (Domenica) = Settimana 1 (ultimo giorno della settimana 26 Gen - 1 Feb)
+  - 2 Feb (Lunedì) = Settimana 2 (nuova settimana inizia)
+  
+  Questo è tecnicamente corretto ma non intuitivo per l'utente.
+- **Soluzione**: Creata nuova utility `src/lib/dateUtils.ts` con:
+  - `getLogicalWeekOfMonth()`: Calcola la settimana in modo user-friendly dove la "Settimana 1" include i primi giorni lavorativi del mese
+  - `getLogicalWeeksInMonth()`: Conta le settimane totali nel mese con la stessa logica
+- **File Modificati**:
+  - `src/lib/dateUtils.ts` (NUOVO) - Utility condivisa per calcolo settimane
+  - `src/components/goals/LongTermGoals.tsx` - Usa le nuove utility
+  - `src/components/goals/MacroGoalsStats.tsx` - Usa le nuove utility per il check scadenze
+- **Risultato Verificato**:
+  - 2 Feb 2026 (Lun) → Settimana 1 ✓
+  - 1 Feb 2026 (Dom) → Settimana 1 ✓
+  - 9 Feb 2026 (Lun) → Settimana 2 ✓
+- **Testing**: Build verificata con successo (`npm run build`).
+
 ### [2026-01-31] Landing Page Demo Section (Desktop Only)
 - **English Translation**: Fully translated the interactive demo into English (UI labels, mock data, navigation).
 - **Refined Trend Chart**: Dynamic data updates based on timeframe (Week, Month, Year, All).

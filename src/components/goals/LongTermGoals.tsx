@@ -33,7 +33,8 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { format, getQuarter, getWeekOfMonth, getWeeksInMonth, startOfMonth } from 'date-fns';
+import { format, getQuarter } from 'date-fns';
+import { getLogicalWeekOfMonth, getLogicalWeeksInMonth } from '@/lib/dateUtils';
 import { it } from 'date-fns/locale';
 
 type GoalType = 'annual' | 'quarterly' | 'monthly' | 'weekly' | 'lifetime' | 'stats';
@@ -67,7 +68,7 @@ export function LongTermGoals() {
     const [selectedQuarter, setSelectedQuarter] = useState<number>(getQuarter(new Date()));
     const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
     // Initialize with current week dynamically
-    const [selectedWeek, setSelectedWeek] = useState<number>(getWeekOfMonth(new Date(), { weekStartsOn: 1 }));
+    const [selectedWeek, setSelectedWeek] = useState<number>(getLogicalWeekOfMonth(new Date()));
     // Default view set to weekly as requested
     const [view, setView] = useState<GoalType>('weekly');
     const [exportScope, setExportScope] = useState<'all' | 'year'>('all');
@@ -504,7 +505,7 @@ export function LongTermGoals() {
                                     <SelectValue placeholder="Settimana" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {Array.from({ length: getWeeksInMonth(new Date(selectedYear === 'all' ? currentYear : parseInt(selectedYear), selectedMonth - 1, 1), { weekStartsOn: 1 }) }, (_, i) => i + 1).map(w => (
+                                    {Array.from({ length: getLogicalWeeksInMonth(new Date(selectedYear === 'all' ? currentYear : parseInt(selectedYear), selectedMonth - 1, 1)) }, (_, i) => i + 1).map(w => (
                                         <SelectItem key={w} value={w.toString()} className={cn(
                                             (selectedYear !== 'all' && parseInt(selectedYear) < currentYear) || (selectedYear === currentYear.toString() && selectedMonth < (new Date().getMonth() + 1)) && "text-muted-foreground italic"
                                         )}>

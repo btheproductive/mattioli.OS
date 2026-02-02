@@ -11,7 +11,8 @@ import {
 } from 'recharts';
 import { Loader2, Trophy, Target, TrendingUp, CheckCircle2, Zap, Brain, Rocket, Calendar, Activity } from 'lucide-react';
 import { useGoalCategories, DEFAULT_CATEGORY_LABELS } from '@/hooks/useGoalCategories';
-import { getQuarter, getWeekOfMonth } from 'date-fns';
+import { getQuarter } from 'date-fns';
+import { getLogicalWeekOfMonth } from '@/lib/dateUtils';
 
 interface MacroGoalsStatsProps {
     year: number | string;
@@ -78,7 +79,7 @@ export function MacroGoalsStats({ year }: MacroGoalsStatsProps) {
             const now = new Date();
             const currentYear = now.getFullYear();
             const currentMonth = now.getMonth() + 1;
-            const currentWeek = getWeekOfMonth(now, { weekStartsOn: 1 });
+            const currentWeek = getLogicalWeekOfMonth(now);
             const currentQuarter = getQuarter(now);
 
             // @ts-expect-error: RPC function signature updated in migration but types not yet regenerated
